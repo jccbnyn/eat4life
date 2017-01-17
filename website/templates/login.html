@@ -1,0 +1,21 @@
+<html>
+    <head>
+        <title>Eat4Life - {{ title }}</title>
+        <script src="{{ url_for('static', filename='jquery-3.1.1.min.js') }}"></script> 
+    </head>
+    <body>
+        <input type="text" id='username' placeholder='username'></input>
+        <input type="text" id='password' placeholder='password'></input>
+        
+        <button type="submit" name='submit' id="btnLogin">Log in</button>
+    </body>
+</html>
+
+<script type="text/javascript">
+$(document).ready(function() {
+    // Document page is ready
+    $("#btnLogin").click(function() {
+        // TODO: Handle login 
+    });
+});
+</script>

@@ -1,3 +1,3 @@
 from website import site
 
-site.run(debug=True)
+site.run(host='0.0.0.0', debug=True)
