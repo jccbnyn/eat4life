@@ -11,8 +11,8 @@ session = DBSession()
 
 # Create objects
 for user in session.query(User).order_by(User.id):
-	print user.name
+	print user.id, user.name
 	 
 	 
 for user in session.query(User).filter(User.name == 'jenn'):
-	print user.name
+	print user.id, user.name
