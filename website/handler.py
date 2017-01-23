@@ -12,11 +12,11 @@ def Index():
     myDBObject.connect()
     print "I'm connected!"
     
-    jenni_user = myDBObject.create_user("jenni2", "test", "jenni", "c", "jenni@gmail.com", "123456789")
-    print jenni_user
+    #jenni_user = myDBObject.create_user("jenni2", "test", "jenni", "c", "jenni@gmail.com", "123456789")
+    #print jenni_user
 
     #print myDBObject.get_user("j")
-    #print myDBObject.get_user("j3")  
+    print myDBObject.get_user(1)  
     
     
     myDBObject.disconnect()

@@ -40,7 +40,7 @@ class DB:
 		# Create a new session and query for a user
 		session = loadSession()
 		user = session.query(User).filter(User.userID == userId).first()
-		print user
+		print "User found! " + user
 		
 		# if there's no such user
 		if user == None:

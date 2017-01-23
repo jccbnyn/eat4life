@@ -10,16 +10,6 @@ engine = create_engine('sqlite:///model.db', echo=True)
 
 Base = declarative_base(engine)
 
-# Create all tables in the engine. This is equivalent to "Create Table"
-# statements in raw SQL.
-Base.metadata.create_all(engine)
-
-Session = sessionmaker(bind=engine)
-
-def loadSession():
-	return Session()
-
-
 class User(Base):
 	__tablename__ = 'user'
 	# Here we define columns for the "user" table
@@ -90,3 +80,13 @@ class CharityMember(Base):
 		return '<CharityMember(%d, %s, %s)>' % (self.charityMemberID,
 		self.charityMember_userID, self.charityMember_charityID)
 	
+
+# Create all tables in the engine. This is equivalent to "Create Table"
+# statements in raw SQL.
+Base.metadata.create_all(engine)
+
+Session = sessionmaker(bind=engine)
+
+def loadSession():
+	return Session()
+
