@@ -1,5 +1,7 @@
 # Import the site
 from website import site
+from Model import User, Charity, CharityMember
+from DBComm import DB
 
 # Import flask objects
 from flask import flash, session, redirect, render_template, url_for
@@ -14,6 +16,7 @@ from wtforms.validators import Required
 from flask.ext.login import UserMixin, login_required
 
 @site.route('/', methods=['GET'])
+<<<<<<< HEAD
 def index():
     '''
     Home page
@@ -161,3 +164,28 @@ class User(UserMixin):
             return User(user_account[0], user_account[1])
 
         return None; # No account found
+=======
+@site.route('/helloWorld', methods=['GET'])
+def Index():
+    myDBObject = DB()
+
+
+
+    myDBObject.connect()
+    print "I'm connected!"
+    
+    #jenni_user = myDBObject.create_user("jenni2", "test", "jenni", "c", "jenni@gmail.com", "123456789")
+    #print jenni_user
+
+    #print myDBObject.get_user("j")
+    print myDBObject.get_user(1)  
+    
+    
+    myDBObject.disconnect()
+    print "I'm not connected!"
+    
+    #Hello, world test
+    return "Hello, world! "
+
+	
+>>>>>>> 377de9a5da6fb1b9be8cb0ee7cb81600390cbcbd
