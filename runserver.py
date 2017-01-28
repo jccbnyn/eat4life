@@ -1,3 +1,8 @@
 from website import site
 
-site.run(host='0.0.0.0', debug=True)
+# Setup key, externally visible, and debug mode
+site.secret_key = 'dev_key'
+site.host = '0.0.0.0'
+site.debug = True
+
+site.run()

@@ -1,20 +1,24 @@
 <html>
     <head>
         <title>Eat4Life - {{ title }}</title>
-        <script src="{{ url_for('static', filename='jquery-3.1.1.min.js') }}"></script> 
     </head>
     <body>
-        <h1>Hello, world!</h1>
-        <button type="button" id="btnLogin">Log into the Eat4Life website</button>
+
+        {% with messages = get_flashed_messages() %}
+          {% if messages %}
+            <ul class=flashes>
+            {% for message in messages %}
+              <li>{{ message }}</li>
+            {% endfor %}
+            </ul>
+          {% endif %}
+        {% endwith %}
+        {% block body %}{% endblock %}
+
+        <h1>Hello, welcome to Eat 4 Life!</h1>
+        
+        <li role="presentation" class="active"><a href="#">Home</a></li>
+        <li role="presentation"><a href="login">Log In</a></li>
+        <li role="presentation"><a href="signup">Sign Up</a></li>
     </body>
 </html>
-
-<script type="text/javascript">
-$(document).ready(function() {
-    $("#btnLogin").click(function() {
-        // Document page is ready
-        // TODO: Handle redirect to login page
-    
-    });
-});
-</script>

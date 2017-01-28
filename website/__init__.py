@@ -1,11 +1,13 @@
-# Import flask lib object
+# Import flask
 from flask import Flask
-# Import flask login objects
-from flask.ext.login import LoginManager
 
-# Setup the site & login manager
+# Setup CSRF Protection for Login/Signup Form Validation
+from flask.ext.wtf import CSRFProtect
+
+# Create the flask site
 site = Flask(__name__)
-login_manager = LoginManager()
-login_manager.init_app(site)
+# Create/Initalize the CSRF Protection on site
+csrf = CSRFProtect()
+csrf.init_app(site)
 
 from website import handler

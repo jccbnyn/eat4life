@@ -1,0 +1,55 @@
+<link rel="stylesheet" href="/static/style.css" type="text/css">
+{% if session['logged_in'] %}
+<p>You're logged in already!</p>
+{% else %}
+
+<html>
+    <head>
+        <title>Eat4Life - {{ title }}</title>
+    </head>
+    <body>
+
+        {% with messages = get_flashed_messages() %}
+          {% if messages %}
+            <ul class=flashes>
+            {% for message in messages %}
+              <li>{{ message }}</li>
+            {% endfor %}
+            </ul>
+          {% endif %}
+        {% endwith %}
+        {% block body %}{% endblock %}
+
+        <h1>Hello, welcome to Eat 4 Life!</h1>
+        
+        <li role="presentation" class="active"><a href="#">Home</a></li>
+        <li role="presentation"><a href="login">Log In</a></li>
+        <li role="presentation"><a href="signup">Sign Up</a></li>
+    </body>
+
+    <form action="signup" method="POST">
+        {{ form.csrf_token }} 
+        <div class="login">
+            <div class="login-screen">
+                <div class="app-title">
+                    <h1>Sign Up</h1>
+                </div>
+                <div class="login-form">
+                    {{ form.firstname.label }} {{ form.firstname(size=20) }}
+                    {{ form.lastname.label }} {{ form.lastname(size=20) }}
+                    {{ form.email.label }} {{ form.email(size=20) }}
+
+                    {{ form.username.label }} {{ form.username(size=20) }}
+                    {{ form.password.label }} {{ form.password(size=20) }}
+                    {{ form.confirm.label }} {{ form.confirm(size=20) }}
+                    
+
+                    <input type="submit"
+                        value="Sign Up" class="btn btn-primary btn-large btn-block" >
+                    <br>
+                </div>
+            </div>
+        </div>
+    </form>
+</html>
+{% endif %}
