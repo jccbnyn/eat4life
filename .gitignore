@@ -1,5 +1,6 @@
 *.pyc
 *.swp
+<<<<<<< HEAD
 *.log
 *.vcd
 *.out
@@ -15,3 +16,5 @@
 *.hex
 *.srec
 *.list
+=======
+>>>>>>> a66c2f3017af1f73cb88dad13423adbc7c5bc3f7
