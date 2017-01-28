@@ -6,13 +6,28 @@ from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 
 class DB:
+	"""
+	This class contains database functions such as create, read, update, 
+	and delete a user.
+	
+	"""
+	
+	
 	def __init__(self):
 		self.database = None
 	
 	def connect(self, host = 'localhost'):
+		"""
+		Args:
+			
+		Returns:
+			No object
+		Raises:
+			Exception if can't connect to the database
+		"""
 		try:
 			if host == 'localhost':
-				engine = create_engine('sqlite:///model.db', echo=True)
+				engine = create_engine('sqlite:///model.db', echo=False)
 				self.database = engine.connect()
 			else:
 				# TODO: fix this later
@@ -22,43 +37,46 @@ class DB:
 		except:
 			raise Exception("Can't connect to the database")
 			
+			
 	def disconnect(self):
 		if self.database != None:
 			self.database.close()
 			self.database = None
 	
 		
-	def get_user(self, userId):
+	def get_user(self, passedInUserName):
 		"""
 		Args:
-			userId - The user's user id
+			passedInUserName - The user's user name
 		Returns:
-			The user object with given userId
+			The user object with given username
 		Raises:
 			Exception if no such user is found
 		"""
+		
 		# Create a new session and query for a user
 		session = loadSession()
-		user = session.query(User).filter(User.userID == userId).first()
-		print "User found! " + user
+		user = session.query(User).filter(User.userName == passedInUserName).first()
+		print "User found! " + str(user)
 		
 		# if there's no such user
 		if user == None:
 			session.close()
-			raise Exception("userId not found/no such user")
+			raise Exception("userName " + passedInUserName + " not found/no such user")
 		
 		return user	
 		
 		
 	def create_user(self, new_userName, new_password, new_firstName, 
 		new_lastName, new_emailAddress, new_phoneNumber):
-		"""
-		Args:
+		"""Creates a user and saves it in the database.
 		
+		Args:
+			new: _username, _password, _firstName, _lastName, _emailAddress, _phoneNum
 		Returns:
 			A new user with the specified args in the user table.
 		Raises:
-			
+			Exception if the user info was not saved properly.
 		"""
 	
 		# Can't have empty username, password, firstname, email
@@ -95,11 +113,48 @@ class DB:
 			session.close()
 			return user
 		else:
-			# Otherwise, user was not saved properly. Rollback save
+			# Otherwise, user was not saved properly, rollback save
 			print '\nDid not create user\n'
 			session.rollback()
 			session.close()
 			
 			raise Exception("Did not save correctly")
+	
+	
+	def delete_user(self, passedInUserName):
+		"""This function deletes an existing user in the database given a userName
+			
+		Args:
+			The user's userName
+		Returns:
+			No object
+		Raises:
+			Exception if the passed-in username does not exist in the db
+		"""
+		
+		# Create a new session & query
+		session = loadSession()
+		user = session.query(User).filter(User.userName == passedInUserName)
+		
+		# Check if user currently exists in db
+		if user.first() == None:
+			# if not, raise an Exception and close the session
+			session.close()
+			raise Exception("userName " + str(passedInUserName) + " NOT found")
+		else:
+			user.delete()
+			session.commit()
+			
+		# Verify that the row has been deleted
+		user = session.query(User).filter(User.userName == passedInUserName).first()
+		if user != None:
+			session.rollback()
+			session.close()
+			raise Exception("userName " + str(passedInUserName) + " was not deleted. Rolling back")
 		
 		
+		
+		
+	# read user
+	# update user
+	# delete user
