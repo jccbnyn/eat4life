@@ -1,2 +1,17 @@
 *.pyc
 *.swp
+*.log
+*.vcd
+*.out
+*.swo
+*.vcd
+*.ignore
+*.dblite
+*.o
+*.a
+*.d
+*.elf
+*.bin
+*.hex
+*.srec
+*.list
