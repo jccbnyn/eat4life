@@ -187,3 +187,7 @@ def Index():
     return "Hello, world! "
 
 
+<<<<<<< HEAD
+=======
+>>>>>>> 377de9a5da6fb1b9be8cb0ee7cb81600390cbcbd
+>>>>>>> 09821bb46e89ea5fac8a01f830548fe193552010
