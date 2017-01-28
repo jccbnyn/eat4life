@@ -7,7 +7,7 @@ from sqlalchemy.schema import ForeignKeyConstraint
 
 # Create an engine that stores data in the local directory
 engine = create_engine('sqlite:///model.db', echo=True)
-
+# 
 Base = declarative_base(engine)
 
 class User(Base):
