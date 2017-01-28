@@ -16,6 +16,7 @@ class DB:
 		self.database = None
 	
 	
+	
 	def connect(self, host = 'localhost'):
 		"""
 		Args:
@@ -38,11 +39,13 @@ class DB:
 			raise Exception("Can't connect to the database")
 			
 			
+			
 	def disconnect(self):
 		if self.database != None:
 			self.database.close()
 			self.database = None
 	
+		
 		
 	def get_user(self, passedInUserName):
 		"""
@@ -57,16 +60,42 @@ class DB:
 		# Create a new session and query for a user
 		session = loadSession()
 		user = session.query(User).filter(User.userName == passedInUserName).first()
-		print "User found! " + str(user)
+		print "\nUser found! \n" + str(user)
 		
 		# if there's no such user
 		if user == None:
 			session.close()
 			raise Exception("userName " + passedInUserName + " not found/no such user")
 		
-		return user	
+		return user
 		
 		
+		
+	def get_allUsers(self):
+		"""		
+		Args:
+			none
+		Returns:
+			All the users stored in the database.
+		Raises:
+			Exception if there are no users saved, i.e., zero users, in the db
+		"""
+		print "all the users below"	
+		# Create a new session
+		session = loadSession()
+		# Query for all users
+		allUsers = session.query(User).all()
+		# Check if query was successful
+		if allUsers == None:
+			session.close()
+			raise Exception("Users not found.")
+		else:
+			print "\nAll the users: \n" + str(allUsers)
+			session.close()
+			return allUsers
+		
+		
+
 	def create_user(self, new_userName, new_password, new_firstName, 
 		new_lastName, new_emailAddress, new_phoneNumber):
 		"""Creates a user and saves it in the database.
@@ -114,6 +143,7 @@ class DB:
 			session.rollback()
 			session.close()
 			raise Exception("Did not save correctly")
+
 	
 	
 	def delete_user(self, passedInUserName):
@@ -146,6 +176,7 @@ class DB:
 			session.rollback()
 			session.close()
 			raise Exception("userName " + str(passedInUserName) + " was not deleted. Rolling back")
+
 		
 		
 	def update_user(self, passedInUserName, new_userName, new_firstName,
@@ -196,14 +227,9 @@ class DB:
 			session.rollback()
 			session.close()
 			raise Exception("username " + str(new_userName) + " not found.")
-
-		session.close()
-		return updated_user		
+		else:
+			session.close()
+			return updated_user		
 			
-	
-		
-		
-		
-		
-	# TODO: read user
 
+	
