@@ -9,12 +9,12 @@ class DB:
 	"""
 	This class contains database functions such as create, read, update, 
 	and delete a user.
-	
 	"""
 	
 	
 	def __init__(self):
 		self.database = None
+	
 	
 	def connect(self, host = 'localhost'):
 		"""
@@ -91,7 +91,6 @@ class DB:
 		
 		# Create a new session
 		session = loadSession()
-		
 		# Create a new user
 		new_user = User(str(new_userName), 
 			str(new_password), 
@@ -99,15 +98,12 @@ class DB:
 			str(new_lastName),
 			str(new_emailAddress),
 			str(new_phoneNumber))
-			
 		# Add new user
 		session.add(new_user)
 		# Commit the record in the database
 		session.commit()
-			
 		# Check if it's saved properly	
 		user = session.query(User).filter(User.userName == new_userName).first()
-			
 		if user != None:
 			print '\nCreated user successfully\n'
 			session.close()
@@ -117,7 +113,6 @@ class DB:
 			print '\nDid not create user\n'
 			session.rollback()
 			session.close()
-			
 			raise Exception("Did not save correctly")
 	
 	
@@ -153,8 +148,62 @@ class DB:
 			raise Exception("userName " + str(passedInUserName) + " was not deleted. Rolling back")
 		
 		
+	def update_user(self, passedInUserName, new_userName, new_firstName,
+		new_lastName, new_email, new_phone):
+		"""Updates an existing user in the database 
+		Args:
+			passedInUserName - The user to update
+			new_userName - The user's new username
+			new_firstName - The user's new first name
+			new_lastName - The user's new last name
+			new_email - The user's new email address
+			new_phone - The users' new phone number
+		Returns:
+			The user with the new information passed in
+		Raises:
+			Exception if the passedInUsername does not exist in the db.
+		"""
+		
+		# Can't have empty username, firstname, email
+		if str(new_userName) == '':
+			raise Exception("Can't have empty username")
+		if str(new_firstName) == '':
+			raise Exception("Can't have empty firstname")
+		if str(new_email) == '':
+			raise Exception("Can't have empty email")
+
+		# Create a new session & query
+		session = loadSession()
+		user = session.query(User).filter(User.userName == passedInUserName).first()
+		
+		# Check if user currently exists in db
+		if user == None:
+			session.close()
+			raise Exception("userName " + str(passedInUserName) + " does NOT exist. Can't update a non-existent user.")
+		else:
+			# Update user row with new values
+			user.userName = str(new_userName)
+			user.firstName = str(new_firstName)
+			user.lastName = str(new_lastName)
+			user.emailAddress = str(new_email)
+			user.phoneNumber = str(new_phone)
+			# Save the update
+			session.commit()
+		
+		# Verify that the update was successful
+		updated_user = session.query(User).filter(User.userName == new_userName).first()
+		if updated_user == None:
+			session.rollback()
+			session.close()
+			raise Exception("username " + str(new_userName) + " not found.")
+
+		session.close()
+		return updated_user		
+			
+	
 		
 		
-	# read user
-	# update user
-	# delete user
+		
+		
+	# TODO: read user
+
