@@ -173,19 +173,19 @@ def Index():
 
     myDBObject.connect()
     print "I'm connected!"
-    
+
     #jenni_user = myDBObject.create_user("jenni2", "test", "jenni", "c", "jenni@gmail.com", "123456789")
     #print jenni_user
 
     #print myDBObject.get_user("j")
-    print myDBObject.get_user(1)  
-    
-    
+    print myDBObject.get_user(1)
+
+
     myDBObject.disconnect()
     print "I'm not connected!"
-    
+
     #Hello, world test
     return "Hello, world! "
 
-	
+
 >>>>>>> 377de9a5da6fb1b9be8cb0ee7cb81600390cbcbd
