@@ -16,7 +16,6 @@ from wtforms.validators import Required
 from flask.ext.login import UserMixin, login_required
 
 @site.route('/', methods=['GET'])
-<<<<<<< HEAD
 def index():
     '''
     Home page
@@ -78,7 +77,7 @@ class LoginForm(Form):
             return False
 
         # Now fetch the user
-        user = User.get(self.username.data)
+        user = DB.get_user(self.username.data)
 
         if user is None:
             # No user found
@@ -164,7 +163,7 @@ class User(UserMixin):
             return User(user_account[0], user_account[1])
 
         return None; # No account found
-=======
+
 @site.route('/helloWorld', methods=['GET'])
 def Index():
     myDBObject = DB()
@@ -188,4 +187,7 @@ def Index():
     return "Hello, world! "
 
 
+<<<<<<< HEAD
+=======
 >>>>>>> 377de9a5da6fb1b9be8cb0ee7cb81600390cbcbd
+>>>>>>> 09821bb46e89ea5fac8a01f830548fe193552010
