@@ -4,3 +4,5 @@ class Hello:
         print "hi!"
     else:
         print "no"
+
+    print "hhhhahaha"
