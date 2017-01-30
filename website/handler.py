@@ -12,9 +12,6 @@ from wtforms import validators
 from wtforms.fields import TextField, StringField, PasswordField
 from wtforms.validators import Required
 
-# Import the login objects
-from flask.ext.login import UserMixin, login_required
-
 @site.route('/', methods=['GET'])
 def index():
     '''
@@ -31,7 +28,7 @@ def login():
     form = LoginForm()
     if form.validate_on_submit():
         print 'VALID LOGIN'
-        flash(u'Successfully logged in as %s' % form.user.id)
+        flash(u'Successfully logged in as %s' % form.user.userName)
         #session['user_id'] = form.user[0]
         return redirect(url_for('index'))
 
@@ -56,7 +53,7 @@ class LoginForm(Form):
     Login class for validating user accounts by
     username and password.
     '''
-    username = StringField('Username', [validators.Length(min=4, max=25)])
+    username = StringField('Username', [validators.Length(min=2, max=25)])
     password = PasswordField('Password',[validators.DataRequired()])
 
     def __init__(self, *args, **kwargs):
@@ -76,9 +73,16 @@ class LoginForm(Form):
         if not rv:
             return False
 
-        # Now fetch the user
-        user = DB.get_user(self.username.data)
+        # Connect to DB
+        db = DB()
+        db.connect()
 
+        # Fetch the user
+        user = db.get_user(self.username.data)
+        db.disconnect()
+        #print user
+
+        # Validate the account's username-pw
         if user is None:
             # No user found
             self.username.errors.append('Invalid login!')
@@ -98,12 +102,15 @@ class SignupForm(Form):
     Signup form class for handling new user account validation.
     '''
 
-    firstname = StringField('FirstName', [
+    firstname = StringField('First Name', [
         validators.DataRequired(),
         validators.Length(min=2)
     ])
-    lastname = StringField('LastName')
-    email = StringField('EmailAddress', [validators.Length(min=6, max=35)])
+    lastname = StringField('Last Name')
+    email = StringField('Email Address', [validators.Length(min=6, max=35)])
+
+    # TODO: Validation on phone? If entered, needs to be certain length
+    phone = StringField('Phone Number', [validators.Length(max=10)])
 
     username = StringField('Username', [
         validators.Length(min=2, max=35),
@@ -135,34 +142,27 @@ class SignupForm(Form):
 
         # TODO: Query to see if the email or username is already taken
 
+        # TODO: Now, insert the new user onto the DB
 
+        db = DB()
+        db.connect()
 
-class User(UserMixin):
-    # proxy for a database of users
-    user_database = {"luis": ("luis", "test"),
-               "jenni": ("jenni", "test"),
-               "tester": ("tester", "test")}
+        new_user = db.create_user(self.username.data, self.password.data,
+                self.firstname.data, self.lastname.data, self.email.data,
+                self.phone.data)
 
-    def __init__(self, username, password):
-        self.id = username
-        self.password = password
+        # TODO: We'll need a flag on the users table (IsValidated)
+        # TODO: We'll need to send a verification email to email address.
+        # Once user is vaidated, update flag and then allow user
+        # to access account
 
-    def check_password(self, password):
-        '''
-        Checks the password provided against the user account
-        '''
-        return (self.password == password)
+        #user = db.get_user(self.username.data)
+        #print user
+        db.disconnect()
 
-    @classmethod
-    def get(cls,id):
-        # Query for the user account
-        user_account = cls.user_database.get(id)
-
-        # If the user account is valid, return it
-        if user_account != None:
-            return User(user_account[0], user_account[1])
-
-        return None; # No account found
+        # Set the login form's user
+        self.user = new_user
+        return True
 
 @site.route('/helloWorld', methods=['GET'])
 def Index():
@@ -177,7 +177,7 @@ def Index():
     #print jenni_user
 
     #print myDBObject.get_user("j")
-    print myDBObject.get_user(1)
+    print myDBObject.get_user('jenni')
 
 
     myDBObject.disconnect()
@@ -185,9 +185,3 @@ def Index():
 
     #Hello, world test
     return "Hello, world! "
-
-
-<<<<<<< HEAD
-=======
->>>>>>> 377de9a5da6fb1b9be8cb0ee7cb81600390cbcbd
->>>>>>> 09821bb46e89ea5fac8a01f830548fe193552010

@@ -7,7 +7,6 @@ from sqlalchemy.schema import ForeignKeyConstraint
 
 # Create an engine that stores data in the local directory
 engine = create_engine('sqlite:///model.db', echo=True)
-# 
 Base = declarative_base(engine)
 
 class User(Base):
@@ -34,6 +33,11 @@ class User(Base):
     def __repr__(self):
         return '<User(%d, %s)>' % (self.userID, self.userName)
 
+    def check_password(self, password):
+        '''
+        Function checks the password of the User vs. passed in pw
+        '''
+        return (self.password == password)
 
 class Charity(Base):
     __tablename__ = 'charity'

@@ -45,8 +45,6 @@ class DB:
             self.database.close()
             self.database = None
 
-
-
     def get_user(self, passedInUserName):
         """
         Args:
@@ -60,16 +58,8 @@ class DB:
         # Create a new session and query for a user
         session = loadSession()
         user = session.query(User).filter(User.userName == passedInUserName).first()
-        print "\nUser found! \n" + str(user)
-
-        # if there's no such user
-        if user == None:
-            session.close()
-            raise Exception("userName " + passedInUserName + " not found/no such user")
-
+        session.close()
         return user
-
-
 
     def get_allUsers(self):
         """
@@ -93,8 +83,6 @@ class DB:
             print "\nAll the users: \n" + str(allUsers)
             session.close()
             return allUsers
-
-
 
     def create_user(self, new_userName, new_password, new_firstName,
             new_lastName, new_emailAddress, new_phoneNumber):
