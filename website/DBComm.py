@@ -45,6 +45,19 @@ class DB:
             self.database.close()
             self.database = None
 
+    def get_user_by_id(self, user_id):
+        """
+        Get the user based on user ID
+        """
+        # TODO: Add doc string
+        # Create a new session and query for a user
+        session = loadSession()
+        user = session.query(User).filter(User.userID == user_id).first()
+        session.close()
+        return user
+
+
+
     def get_user(self, passedInUserName):
         """
         Args:

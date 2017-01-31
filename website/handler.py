@@ -1,16 +1,21 @@
 # Import the site
 from website import site
+
+# Import DB objects
 from Model import User, Charity, CharityMember
 from DBComm import DB
 
 # Import flask objects
-from flask import flash, session, redirect, render_template, url_for
+from flask import flash, abort, session, redirect, render_template, url_for
 
 # Import flask WTF Forms to handle login validation
 from flask.ext.wtf import Form
 from wtforms import validators
 from wtforms.fields import TextField, StringField, PasswordField
 from wtforms.validators import Required
+
+# Import ItsDangerous for crypyo signing IDs
+from itsdangerous import URLSafeSerializer, BadSignature
 
 @site.route('/', methods=['GET'])
 def index():
@@ -47,6 +52,45 @@ def sign_up():
         return redirect(url_for('index'))
 
     return render_template('signup.html', form=form)
+
+@site.route("/activate/<key>", methods=['GET'])
+def activate_user(key):
+    '''
+    Handles verifying that the user's email account is valid.
+    '''
+    # Create a serializer using our app's secret key
+    serializer = URLSafeSerializer(site.secret_key)
+    # Try to load in the key to verify it
+    try:
+        user_id = serializer.loads(key)
+    except BadSignature:
+        abort(404)
+    print user_id
+
+    # Fetch the user based on the decrypted user ID
+    db = DB()
+    db.connect()
+    user = db.get_user_by_id(user_id)
+    db.disconnect()
+
+    if user is None:
+        # Invalid user found
+        print 'Invalid verification, user not found'
+        abort(404)
+    else:
+        # TODO: Activate user account
+        # TODO: Notify user account is valid now, redirect to account screen
+        return "Valid account verification!"
+
+@site.route('/genkey/<user_id>', methods=['GET'])
+def generate_key(user_id):
+    '''
+    THIS IS ONLY FOR TESTING. DON'T USE IN PROD
+    '''
+    # TODO: Remove this once tested that serialization works
+    serializer = URLSafeSerializer(site.secret_key)
+    url = serializer.dumps(user_id)
+    return url
 
 class LoginForm(Form):
     '''
@@ -163,25 +207,3 @@ class SignupForm(Form):
         # Set the login form's user
         self.user = new_user
         return True
-
-@site.route('/helloWorld', methods=['GET'])
-def Index():
-    myDBObject = DB()
-
-
-
-    myDBObject.connect()
-    print "I'm connected!"
-
-    #jenni_user = myDBObject.create_user("jenni2", "test", "jenni", "c", "jenni@gmail.com", "123456789")
-    #print jenni_user
-
-    #print myDBObject.get_user("j")
-    print myDBObject.get_user('jenni')
-
-
-    myDBObject.disconnect()
-    print "I'm not connected!"
-
-    #Hello, world test
-    return "Hello, world! "
