@@ -4,10 +4,12 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship, backref
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.schema import ForeignKeyConstraint
+import bcrypt
 
 # Create an engine that stores data in the local directory
 engine = create_engine('sqlite:///model.db', echo=True)
 Base = declarative_base(engine)
+
 
 class User(Base):
     __tablename__ = 'user'
@@ -22,22 +24,28 @@ class User(Base):
 
     def __init__(self, userName, password, firstName, lastName,
             emailAddress, phoneNumber):
-
         self.userName = userName
-        self.password = password
+        # Hash a password for the first time, with a randomly-generated salt
+        self.password = bcrypt.hashpw(password, bcrypt.gensalt())
         self.firstName = firstName
         self.lastName = lastName
         self.emailAddress = emailAddress
         self.phoneNumber = phoneNumber
 
     def __repr__(self):
-        return '<User(%d, %s)>' % (self.userID, self.userName)
+        return '<User(%d, %s, %s, %s)>' % (self.userID, self.userName, self.firstName, self.lastName)
+
+    def validate_password(self, password):
+        """ Checks that an unhashed password matches one that has previously been hashed
+        """
+        return bcrypt.checkpw(password, self.password)
 
     def check_password(self, password):
         '''
         Function checks the password of the User vs. passed in pw
         '''
         return (self.password == password)
+
 
 class Charity(Base):
     __tablename__ = 'charity'
@@ -64,15 +72,12 @@ class CharityMember(Base):
     __tablename__ = 'charity_member'
     # Here we define columns for the "charity_member" table
     charityMemberID = Column(Integer, primary_key=True, nullable=False)
-
     charityMember_userID = Column(Integer, ForeignKey("user.userID"))
-
     charityMember_charityID = Column(Integer, ForeignKey("charity.charityID"))
 
     # variable names
     charityMember_User = relationship(
             "User", foreign_keys=[charityMember_userID])
-
     charityMember_Charity = relationship(
             "Charity", foreign_keys=[charityMember_charityID])
 
@@ -90,6 +95,7 @@ class CharityMember(Base):
 Base.metadata.create_all(engine)
 
 Session = sessionmaker(bind=engine)
+
 
 def loadSession():
     return Session()

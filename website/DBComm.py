@@ -11,10 +11,8 @@ class DB:
     and delete a user.
     """
 
-
     def __init__(self):
         self.database = None
-
 
 
     def connect(self, host = 'localhost'):
@@ -39,11 +37,11 @@ class DB:
             raise Exception("Can't connect to the database")
 
 
-
     def disconnect(self):
         if self.database != None:
             self.database.close()
             self.database = None
+
 
     def get_user_by_id(self, user_id):
         """
@@ -57,7 +55,6 @@ class DB:
         return user
 
 
-
     def get_user(self, passedInUserName):
         """
         Args:
@@ -67,12 +64,12 @@ class DB:
         Raises:
                 Exception if no such user is found
         """
-
         # Create a new session and query for a user
         session = loadSession()
         user = session.query(User).filter(User.userName == passedInUserName).first()
         session.close()
         return user
+
 
     def get_allUsers(self):
         """
@@ -97,9 +94,10 @@ class DB:
             session.close()
             return allUsers
 
+
     def create_user(self, new_userName, new_password, new_firstName,
             new_lastName, new_emailAddress, new_phoneNumber):
-        """Creates a user and saves it in the database.
+        """ Creates a user and saves it in the database.
 
         Args:
                 new: _username, _password, _firstName, _lastName, _emailAddress, _phoneNum
@@ -108,7 +106,6 @@ class DB:
         Raises:
                 Exception if the user info was not saved properly.
         """
-
         # Can't have empty username, password, firstname, email
         if str(new_userName) == '':
             raise Exception("Can't have empty username")
@@ -146,9 +143,8 @@ class DB:
             raise Exception("Did not save correctly")
 
 
-
     def delete_user(self, passedInUserName):
-        """This function deletes an existing user in the database given a userName
+        """ This function deletes an existing user in the database given a userName
 
         Args:
                 The user's userName
@@ -157,7 +153,6 @@ class DB:
         Raises:
                 Exception if the passed-in username does not exist in the db
         """
-
         # Create a new session & query
         session = loadSession()
         user = session.query(User).filter(User.userName == passedInUserName)
@@ -179,10 +174,10 @@ class DB:
             raise Exception("userName " + str(passedInUserName) + " was not deleted. Rolling back")
 
 
-
     def update_user(self, passedInUserName, new_userName, new_firstName,
             new_lastName, new_email, new_phone):
-        """Updates an existing user in the database
+        """ Updates an existing user in the database
+        
         Args:
                 passedInUserName - The user to update
                 new_userName - The user's new username
@@ -195,7 +190,6 @@ class DB:
         Raises:
                 Exception if the passedInUsername does not exist in the db.
         """
-
         # Can't have empty username, firstname, email
         if str(new_userName) == '':
             raise Exception("Can't have empty username")
@@ -231,3 +225,5 @@ class DB:
         else:
             session.close()
             return updated_user
+
+
