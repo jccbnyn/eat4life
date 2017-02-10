@@ -35,13 +35,24 @@ class User(Base):
     def __repr__(self):
         return '<User(%d, %s, %s, %s)>' % (self.userID, self.userName, self.firstName, self.lastName)
 
-    def validate_password(self, password):
+    def verify_password(self, password):
         """ Checks that an unhashed password matches one that has previously been hashed
         """
-        return bcrypt.checkpw(password, self.password)
+        print "passed in password: " + password
+        print "password in db: " + self.password
+        pwhash = bcrypt.hashpw(password.encode('utf-8'), self.password.encode('utf-8'))
+        return self.password == pwhash
+       
+        #pwd = "test"
+        #hashed = bcrypt.hashpw(password, bcrypt.gensalt())
+        #print "hashed: " + hashed
+        #a = bcrypt.hashpw(password, hashed) == self.password
+        
+        #print a
+        #return a
 
     def check_password(self, password):
-        '''
+        ''' TODO: delete this later because we have verify_password now
         Function checks the password of the User vs. passed in pw
         '''
         return (self.password == password)
