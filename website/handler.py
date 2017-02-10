@@ -1,5 +1,5 @@
 # Import the site
-from website import site
+from website import site, mail
 
 # Import DB objects
 from Model import User, Charity, CharityMember
@@ -49,9 +49,27 @@ def sign_up():
         print 'Valid Sign up!'
         flash (u'Signed up successful!')
         #session['user_id'] = form.user[0]
+
+        # Now send an email with the verification link
+        serializer = URLSafeSerializer(site.secret_key)
+        url = serializer.dumps(form.user.userID)
+
+        mail.sendMail(form.user.emailAddress,
+                'Eat4Life - Verification Required',
+                'Please verify your email: http://localhost:5000/activate/' + url)
+
         return redirect(url_for('index'))
 
     return render_template('signup.html', form=form)
+
+@site.route("/mail", methods=['GET'])
+def mail_test():
+    '''
+    Sends a test email
+    '''
+    # TODO: Removes this in prod
+    mail.sendMail('luis111290@gmail.com', 'Hello!', 'Test Message!')
+    return "Sent"
 
 @site.route("/activate/<key>", methods=['GET'])
 def activate_user(key):
@@ -70,17 +88,13 @@ def activate_user(key):
     # Fetch the user based on the decrypted user ID
     db = DB()
     db.connect()
-    user = db.get_user_by_id(user_id)
+    # Valid user, update/verify account
+    # TODO: Activate user account
+    # TODO: Notify user account is valid now, redirect to account screen
+    db.verify_user_by_id(user_id)
     db.disconnect()
 
-    if user is None:
-        # Invalid user found
-        print 'Invalid verification, user not found'
-        abort(404)
-    else:
-        # TODO: Activate user account
-        # TODO: Notify user account is valid now, redirect to account screen
-        return "Valid account verification!"
+    return 'Successful!'
 
 @site.route('/genkey/<user_id>', methods=['GET'])
 def generate_key(user_id):
@@ -91,6 +105,16 @@ def generate_key(user_id):
     serializer = URLSafeSerializer(site.secret_key)
     url = serializer.dumps(user_id)
     return url
+
+@site.route('/isverified', methods=['GET'])
+def isverified():
+    db = DB()
+    db.connect()
+
+    user = db.get_user_by_id(1)
+
+    db.disconnect()
+    return str(user.isEmailVerified)
 
 class LoginForm(Form):
     '''
@@ -172,7 +196,6 @@ class SignupForm(Form):
         '''
         Form.__init__(self, *args, **kwargs)
         self.user = None
-
 
     def validate(self):
         '''

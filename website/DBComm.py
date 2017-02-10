@@ -5,22 +5,20 @@ from Model import User, Charity, CharityMember, loadSession
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 
+import datetime
+
 class DB:
     """
     This class contains database functions such as create, read, update,
     and delete a user.
     """
 
-
     def __init__(self):
         self.database = None
-
-
 
     def connect(self, host = 'localhost'):
         """
         Args:
-
         Returns:
                 No object
         Raises:
@@ -38,8 +36,6 @@ class DB:
         except:
             raise Exception("Can't connect to the database")
 
-
-
     def disconnect(self):
         if self.database != None:
             self.database.close()
@@ -55,8 +51,6 @@ class DB:
         user = session.query(User).filter(User.userID == user_id).first()
         session.close()
         return user
-
-
 
     def get_user(self, passedInUserName):
         """
@@ -145,8 +139,6 @@ class DB:
             session.close()
             raise Exception("Did not save correctly")
 
-
-
     def delete_user(self, passedInUserName):
         """This function deletes an existing user in the database given a userName
 
@@ -178,7 +170,24 @@ class DB:
             session.close()
             raise Exception("userName " + str(passedInUserName) + " was not deleted. Rolling back")
 
+    def verify_user_by_id(self, user_id):
+        """
+        Function activates the user account & sets the flag.
+        """
+        # Create a new session & query
+        session = loadSession()
+        user = session.query(User).filter(User.userID == user_id).first()
+        print user.isEmailVerified
 
+        # Check if user currently exists in db
+        if user == None:
+            session.close()
+        else:
+            # Update user to verified
+            user.isEmailVerified = True
+            user.emailVerifiedDate = datetime.datetime.now()
+            session.commit()
+            session.close()
 
     def update_user(self, passedInUserName, new_userName, new_firstName,
             new_lastName, new_email, new_phone):
@@ -211,7 +220,10 @@ class DB:
         # Check if user currently exists in db
         if user == None:
             session.close()
-            raise Exception("userName " + str(passedInUserName) + " does NOT exist. Can't update a non-existent user.")
+            raise Exception("userName "
+                    + str(passedInUserName)
+                    + " does NOT exist. "
+                    + "Can't update a non-existent user.")
         else:
             # Update user row with new values
             user.userName = str(new_userName)
@@ -223,7 +235,9 @@ class DB:
             session.commit()
 
         # Verify that the update was successful
-        updated_user = session.query(User).filter(User.userName == new_userName).first()
+        updated_user = session.query(User).filter(
+                User.userName == new_userName).first()
+
         if updated_user == None:
             session.rollback()
             session.close()

@@ -19,6 +19,8 @@ class User(Base):
     lastName = Column(String(length=30))
     emailAddress = Column(String(length=30), nullable=False)
     phoneNumber = Column(String(length=20))
+    isEmailVerified = Column(Boolean, nullable=False, default=False)
+    emailVerifiedDate = Column(DateTime)
 
     def __init__(self, userName, password, firstName, lastName,
             emailAddress, phoneNumber):
