@@ -4,10 +4,12 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship, backref
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.schema import ForeignKeyConstraint
+import bcrypt
 
 # Create an engine that stores data in the local directory
 engine = create_engine('sqlite:///model.db', echo=True)
 Base = declarative_base(engine)
+
 
 class User(Base):
     __tablename__ = 'user'
@@ -24,22 +26,39 @@ class User(Base):
 
     def __init__(self, userName, password, firstName, lastName,
             emailAddress, phoneNumber):
-
         self.userName = userName
-        self.password = password
+        # Hash a password for the first time, with a randomly-generated salt
+        self.password = bcrypt.hashpw(password, bcrypt.gensalt())
         self.firstName = firstName
         self.lastName = lastName
         self.emailAddress = emailAddress
         self.phoneNumber = phoneNumber
 
     def __repr__(self):
-        return '<User(%d, %s)>' % (self.userID, self.userName)
+        return '<User(%d, %s, %s, %s)>' % (self.userID, self.userName, self.firstName, self.lastName)
+
+    def verify_password(self, password):
+        """ Checks that an unhashed password matches one that has previously been hashed
+        """
+        print "passed in password: " + password
+        print "password in db: " + self.password
+        pwhash = bcrypt.hashpw(password.encode('utf-8'), self.password.encode('utf-8'))
+        return self.password == pwhash
+       
+        #pwd = "test"
+        #hashed = bcrypt.hashpw(password, bcrypt.gensalt())
+        #print "hashed: " + hashed
+        #a = bcrypt.hashpw(password, hashed) == self.password
+        
+        #print a
+        #return a
 
     def check_password(self, password):
-        '''
+        ''' TODO: delete this later because we have verify_password now
         Function checks the password of the User vs. passed in pw
         '''
         return (self.password == password)
+
 
 class Charity(Base):
     __tablename__ = 'charity'
@@ -66,15 +85,12 @@ class CharityMember(Base):
     __tablename__ = 'charity_member'
     # Here we define columns for the "charity_member" table
     charityMemberID = Column(Integer, primary_key=True, nullable=False)
-
     charityMember_userID = Column(Integer, ForeignKey("user.userID"))
-
     charityMember_charityID = Column(Integer, ForeignKey("charity.charityID"))
 
     # variable names
     charityMember_User = relationship(
             "User", foreign_keys=[charityMember_userID])
-
     charityMember_Charity = relationship(
             "Charity", foreign_keys=[charityMember_charityID])
 
@@ -92,6 +108,7 @@ class CharityMember(Base):
 Base.metadata.create_all(engine)
 
 Session = sessionmaker(bind=engine)
+
 
 def loadSession():
     return Session()
