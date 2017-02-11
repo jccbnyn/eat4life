@@ -85,13 +85,11 @@ def activate_user(key):
         user_id = serializer.loads(key)
     except BadSignature:
         abort(404)
-    print user_id
 
     # Fetch the user based on the decrypted user ID
     db = DB()
     db.connect()
     # Valid user, update/verify account
-    # TODO: Activate user account
     # TODO: Notify user account is valid now, redirect to account screen
     db.verify_user_by_id(user_id)
     db.disconnect()
@@ -108,16 +106,6 @@ def generate_key(user_id):
     url = serializer.dumps(user_id)
     return url
 
-@site.route('/isverified', methods=['GET'])
-def isverified():
-    db = DB()
-    db.connect()
-
-    user = db.get_user_by_id(1)
-
-    db.disconnect()
-    return str(user.isEmailVerified)
-
 def flash_errors(form):
     '''
     Function expects a Flask WTF Form and will
@@ -127,8 +115,7 @@ def flash_errors(form):
         for error in errors:
             flash(
                 u"Error in the %s field - %s"
-                % (getattr(form, field).label.text,error)
-            )
+                % (getattr(form, field).label.text,error))
 
 
 class LoginForm(Form):
@@ -171,7 +158,7 @@ class LoginForm(Form):
             self.username.errors.append('Invalid login!')
             return False
 
-        if not user.check_password(self.password.data):
+        if not user.verify_password(self.password.data):
             # Password invalid
             self.password.errors.append('Invalid login!')
             return False
@@ -233,13 +220,6 @@ class SignupForm(Form):
                 self.firstname.data, self.lastname.data, self.email.data,
                 self.phone.data)
 
-        # TODO: We'll need a flag on the users table (IsValidated)
-        # TODO: We'll need to send a verification email to email address.
-        # Once user is vaidated, update flag and then allow user
-        # to access account
-
-        #user = db.get_user(self.username.data)
-        #print user
         db.disconnect()
 
         # Set the login form's user

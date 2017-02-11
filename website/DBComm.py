@@ -46,9 +46,9 @@ class DB:
 
     def get_user_by_id(self, user_id):
         """
-        Get the user based on user ID
+        Get the user based on user ID.
+        Function expects a int user_id to be passed in.
         """
-        # TODO: Add doc string
         # Create a new session and query for a user
         session = loadSession()
         user = session.query(User).filter(User.userID == user_id).first()
@@ -67,7 +67,8 @@ class DB:
         """
         # Create a new session and query for a user
         session = loadSession()
-        user = session.query(User).filter(User.userName == passedInUserName).first()
+        user = (session.query(User).filter(
+            User.userName == passedInUserName).first())
         session.close()
         return user
 
@@ -79,9 +80,9 @@ class DB:
         Returns:
                 All the users stored in the database.
         Raises:
-                Exception if there are no users saved, i.e., zero users, in the db
+                Exception if there are no users saved,
+                i.e., zero users, in the db
         """
-        print "all the users below"
         # Create a new session
         session = loadSession()
         # Query for all users
@@ -91,7 +92,6 @@ class DB:
             session.close()
             raise Exception("Users not found.")
         else:
-            print "\nAll the users: \n" + str(allUsers)
             session.close()
             return allUsers
 
@@ -101,7 +101,8 @@ class DB:
         """ Creates a user and saves it in the database.
 
         Args:
-                new: _username, _password, _firstName, _lastName, _emailAddress, _phoneNum
+                new: _username, _password, _firstName,
+                _lastName, _emailAddress, _phoneNum
         Returns:
                 A new user with the specified args in the user table.
         Raises:
@@ -131,7 +132,9 @@ class DB:
         # Commit the record in the database
         session.commit()
         # Check if it's saved properly
-        user = session.query(User).filter(User.userName == new_userName).first()
+        user = (session.query(User).filter(
+            User.userName == new_userName).first())
+
         if user != None:
             print '\nCreated user successfully\n'
             session.close()
@@ -145,7 +148,8 @@ class DB:
 
 
     def delete_user(self, passedInUserName):
-        """ This function deletes an existing user in the database given a userName
+        """ This function deletes an existing user
+            in the database given a userName
 
         Args:
                 The user's userName
@@ -168,12 +172,15 @@ class DB:
             session.commit()
 
         # Verify that the row has been deleted
-        user = session.query(User).filter(User.userName == passedInUserName).first()
+        user = (session.query(User).filter(
+            User.userName == passedInUserName).first())
+
         if user != None:
             session.rollback()
             session.close()
             raise Exception("userName "
-                    + str(passedInUserName) + " was not deleted. Rolling back")
+                    + str(passedInUserName)
+                    + " was not deleted. Rolling back")
 
 
     def verify_user_by_id(self, user_id):
@@ -183,7 +190,6 @@ class DB:
         # Create a new session & query
         session = loadSession()
         user = session.query(User).filter(User.userID == user_id).first()
-        print user.isEmailVerified
 
         # Check if user currently exists in db
         if user == None:
@@ -222,7 +228,8 @@ class DB:
 
         # Create a new session & query
         session = loadSession()
-        user = session.query(User).filter(User.userName == passedInUserName).first()
+        user = (session.query(User).filter(
+            User.userName == passedInUserName).first())
 
         # Check if user currently exists in db
         if user == None:

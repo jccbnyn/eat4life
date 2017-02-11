@@ -10,7 +10,6 @@ import bcrypt
 engine = create_engine('sqlite:///model.db', echo=True)
 Base = declarative_base(engine)
 
-
 class User(Base):
     __tablename__ = 'user'
     # Here we define columns for the "user" table
@@ -35,29 +34,20 @@ class User(Base):
         self.phoneNumber = phoneNumber
 
     def __repr__(self):
-        return '<User(%d, %s, %s, %s)>' % (self.userID, self.userName, self.firstName, self.lastName)
+        """
+        To String for printing user
+        """
+        return ('<User(%d, %s, %s, %s)>'
+                % (self.userID, self.userName, self.firstName, self.lastName))
 
     def verify_password(self, password):
-        """ Checks that an unhashed password matches one that has previously been hashed
         """
-        print "passed in password: " + password
-        print "password in db: " + self.password
-        pwhash = bcrypt.hashpw(password.encode('utf-8'), self.password.encode('utf-8'))
+        Checks that an unhashed password matches
+        one that has previously been hashed
+        """
+        pwhash = bcrypt.hashpw(
+                password.encode('utf-8'), self.password.encode('utf-8'))
         return self.password == pwhash
-       
-        #pwd = "test"
-        #hashed = bcrypt.hashpw(password, bcrypt.gensalt())
-        #print "hashed: " + hashed
-        #a = bcrypt.hashpw(password, hashed) == self.password
-        
-        #print a
-        #return a
-
-    def check_password(self, password):
-        ''' TODO: delete this later because we have verify_password now
-        Function checks the password of the User vs. passed in pw
-        '''
-        return (self.password == password)
 
 
 class Charity(Base):
@@ -78,6 +68,9 @@ class Charity(Base):
         self.charityPhone = charityPhone
 
     def __repr__(self):
+        """
+        To String for printing charity
+        """
         return '<Charity(%d, %s)>' % (self.charityID, self.charityName)
 
 
@@ -99,16 +92,17 @@ class CharityMember(Base):
         self.charityMember_charityID = charityMember_charityID
 
     def __repr__(self):
-        return '<CharityMember(%d, %s, %s)>' % (self.charityMemberID,
-        self.charityMember_userID, self.charityMember_charityID)
-
+        """
+        To String for printing user
+        """
+        return ('<CharityMember(%d, %s, %s)>'
+                % (self.charityMemberID, self.charityMember_userID,
+                    self.charityMember_charityID))
 
 # Create all tables in the engine. This is equivalent to "Create Table"
 # statements in raw SQL.
 Base.metadata.create_all(engine)
-
 Session = sessionmaker(bind=engine)
-
 
 def loadSession():
     return Session()
