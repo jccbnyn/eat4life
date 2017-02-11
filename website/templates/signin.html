@@ -1,0 +1,65 @@
+<link rel="stylesheet" href="/static/styles.css" type="text/css">
+<link rel='stylesheet prefetch' href='http://fonts.googleapis.com/css?family=Open+Sans:600'>
+
+
+{% if session['logged_in'] %}
+<p>You're logged in already!</p>
+{% else %}
+<html>
+    <head>
+    <meta charset="UTF-8">
+    <title>Login to Eat4Life</title>
+    </head>
+
+    <body>
+        {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            <ul class=flashes>
+                {% for message in messages %}
+                <li>{{ message }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+        {% endwith %}
+        {% block body %}{% endblock %}
+        
+
+        <li role="presentation" class="active"><a href="/">Home</a></li>
+        <li role="presentation"><a href="#">Log In</a></li>
+        <li role="presentation"><a href="signup">Sign Up</a></li>    
+    
+        <form action="login" method="POST">
+        {{ form.csrf_token }} 
+        <div class="login-wrap">
+            <div class="login-html">
+                <input id="tab-1" type="radio" name="tab" class="sign-in" checked>
+                <label for="tab-1" class="tab">Sign In</label>
+                <div class="login-form">
+                    <div class="sign-in-htm">
+                        <div class="group">
+                            <label for="user" class="label">Username</label>
+                            <input class="input" {{ form.username(size=20) }}
+                        </div>
+                        <div class="group">
+                            <label for="pass" class="label">Password</label>
+                            <input class="input" {{ form.password(size=20) }}        
+                        </div>
+                        <div class="group">
+                            <input type="submit" class="button" value="Sign In">
+                        </div>
+                    <div class="hr"></div>
+                    <div class="foot-lnk">
+                        <a href="#forgot">Forgot Password?</a>
+                    </div>
+                </div>
+                <!-- We can put the sign-up-htm class here if we want-->
+                </div>
+            </div>
+        </div>
+        </form>
+  
+    </body>
+
+    
+</html>
+{% endif %}
