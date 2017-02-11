@@ -37,6 +37,7 @@ def login():
         #session['user_id'] = form.user[0]
         return redirect(url_for('index'))
 
+    flash_errors(form)
     return render_template('login.html', form=form)
 
 @site.route("/signup", methods=["GET", 'POST'])
@@ -60,6 +61,7 @@ def sign_up():
 
         return redirect(url_for('index'))
 
+    flash_errors(form)
     return render_template('signup.html', form=form)
 
 @site.route("/mail", methods=['GET'])
@@ -115,6 +117,19 @@ def isverified():
 
     db.disconnect()
     return str(user.isEmailVerified)
+
+def flash_errors(form):
+    '''
+    Function expects a Flask WTF Form and will
+    flash the error messages in the HTML form.
+    '''
+    for field, errors in form.errors.items():
+        for error in errors:
+            flash(
+                u"Error in the %s field - %s"
+                % (getattr(form, field).label.text,error)
+            )
+
 
 class LoginForm(Form):
     '''
