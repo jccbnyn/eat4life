@@ -44,32 +44,32 @@
                         <div class="sign-up-htm">
                             <div class="group">
                                 <label for="user" class="label"> Username </label>
-                                <input id="user" class="input" >
+                                <input id="user" class="input" {{ form.username(size=20) }}
                             </div>
                             <div class="group">
                                 <label for="pass" class="label"> Password </label>
-                                <input id="user" class="input" >
+                                <input id="user" class="input" {{ form.password(size=20) }}
                             </div>
                             <div class="group">
                                 <label for="pass" class="label"> Repeat Password </label>
-                                <input id="pass" class="input" > 
+                                <input id="pass" class="input" {{ form.confirm(size=20) }}
 
                             </div>
                             <div class="group">
                                 <label for="pass" class="label"> First name </label>
-                                <input id="pass" class="input" >
+                                <input id="pass" class="input" {{ form.firstname(size=20) }}
                             </div>                
                             <div class="group">
                                 <label for="pass" class="label"> Last name </label>
-                                <input id="pass" class="input" >
+                                <input id="pass" class="input" {{ form.lastname(size=20) }}
                             </div>     
                             <div class="group">
                                 <label for="pass" class="label"> Email address </label>
-                                <input id="pass" class="input" >
+                                <input id="pass" class="input" {{ form.email(size=20) }}
                             </div>                                 
                             <div class="group">
                                 <label for="pass" class="label"> Phone number </label>
-                                <input id="pass" class="input" >
+                                <input id="pass" class="input" {{ form.phone(size=20) }}
                             </div>                                                     
                             <div class="group">
                                 <input type="submit" class="button" value="Sign Up">
@@ -78,41 +78,12 @@
                             
                             <div class="hr"></div>
                             <div class="foot-lnk">
+                                <!-- TODO: -->
                                 <label for="tab-1"> Already a Member? </label>
                             </div>
                                                         
                         </div>
-                    </form>
-
-
-
-
-    <!--
-    <form action="signup" method="POST">
-        {{ form.csrf_token }} 
-        <div class="login">
-            <div class="login-screen">
-                <div class="app-title">
-                    <h1>Sign Up</h1>
-                </div>
-                <div class="login-form">
-                    {{ form.firstname.label }} {{ form.firstname(size=20) }}
-                    {{ form.lastname.label }} {{ form.lastname(size=20) }}
-                    {{ form.email.label }} {{ form.email(size=20) }}
-                    {{ form.phone.label }} {{ form.phone(size=20) }}
-
-                    {{ form.username.label }} {{ form.username(size=20) }}
-                    {{ form.password.label }} {{ form.password(size=20) }}
-                    {{ form.confirm.label }} {{ form.confirm(size=20) }}
-                    <input type="submit"
-                        value="Sign Up"
-                        class="btn btn-primary btn-large btn-block" >
-                    <br>
-                </div>
-            </div>
-        </div>
-    </form> -->
-    
+        </form>  
     
     </body>
 </html>
