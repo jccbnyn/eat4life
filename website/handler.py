@@ -17,11 +17,42 @@ from wtforms.validators import Required
 # Import ItsDangerous for crypyo signing IDs
 from itsdangerous import URLSafeSerializer, BadSignature
 
+@site.route('/account', methods=['GET'])
+def account_home():
+    '''
+    The user account's home page
+    '''
+    # Make sure that the session is valid
+    if not 'user_id' in session:
+        flash(u'You must be logged in first!')
+        return redirect(url_for('login'))
+
+    # Validate that the user ID is for an valid user
+    # TODO: Add check that the session's user ID is valid
+    return render_template('account_home.html')
+
+@site.route('/account/details', methods=['GET', 'POST'])
+def account_details():
+    '''
+    Account details page. Allows user to update information.
+    '''
+    if not 'user_id' in session:
+        flash(u'You must be logged in first!')
+        return redirect(url_for('login'))
+
+
+    return render_template('account_details.html')
+
 @site.route('/', methods=['GET'])
 def index():
     '''
     Home page
     '''
+    # If there's a user's session, redirect to account
+    if 'user_id' in session:
+        # TODO: Validate user ID
+        return redirect(url_for('account_home'))
+
     return render_template('index.html', title='Home')
 
 @site.route('/login', methods=['GET', 'POST'])
@@ -30,26 +61,46 @@ def login():
     Handles active user log ins. Checks if
     user is already logged in.
     '''
+    if 'user_id' in session:
+        # User already has session, redirect to account
+        flash(u'You are already logged in!')
+        return redirect(url_for('account_home'))
+
     form = LoginForm()
     if form.validate_on_submit():
         print 'VALID LOGIN'
         flash(u'Successfully logged in as %s' % form.user.userName)
-        #session['user_id'] = form.user[0]
-        return redirect(url_for('index'))
+        session['user_id'] = form.user.userID
+        return redirect(url_for('account_home'))
 
     flash_errors(form)
     return render_template('login.html', form=form)
+
+@site.route('/logout', methods=['GET'])
+def logout():
+    '''
+    Handles logging out the active user
+    '''
+    # Remove the user ID from session
+    session.pop('user_id', None)
+    return redirect(url_for('index'))
 
 @site.route("/signup", methods=["GET", 'POST'])
 def sign_up():
     '''
     Handles new user sign ups
     '''
+    # Check if user is already in session
+    if 'user_id' in session:
+        # Cannot sign up if on your account
+        flash (u'Please log out to create a new account.')
+        return redirect(url_for('account_home'))
+
     form = SignupForm()
     if form.validate_on_submit():
         print 'Valid Sign up!'
         flash (u'Signed up successful!')
-        #session['user_id'] = form.user[0]
+        session['user_id'] = form.user.userID
 
         # Now send an email with the verification link
         serializer = URLSafeSerializer(site.secret_key)

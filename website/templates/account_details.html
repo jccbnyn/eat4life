@@ -8,6 +8,7 @@
         <title>Eat4Life - {{ title }}</title>
     </head>
     <body>
+        <h1>Hello, welcome to Eat 4 Life!</h1>
         {% with messages = get_flashed_messages() %}
           {% if messages %}
             <ul class=flashes>
@@ -19,10 +20,10 @@
         {% endwith %}
         {% block body %}{% endblock %}
 
-        
-        <li role="presentation" class="active"><a href="/">Home</a></li>
-        <li role="presentation"><a href="login">Log In</a></li>
-        <li role="presentation"><a href="signup">Sign Up</a></li>
+        <li role="presentation" class="active"><a href="account_home">Home</a></li>
+        <li role="presentation" class="active"><a href="account_details">Account Details</a></li>
+        <li role="presentation"><a href="logout">Log out</a></li>
+
     </body>
 
     <form action="signup" method="POST">
@@ -42,7 +43,7 @@
                     {{ form.password.label }} {{ form.password(size=20) }}
                     {{ form.confirm.label }} {{ form.confirm(size=20) }}
                     <input type="submit"
-                        value="Sign Up"
+                        value="Update"
                         class="btn btn-primary btn-large btn-block" >
                     <br>
                 </div>
