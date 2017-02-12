@@ -7,8 +7,8 @@
 {% else %}
 <html>
     <head>
-    <meta charset="UTF-8">
-    <title>Login to Eat4Life</title>
+        <meta charset="UTF-8">
+        <title>Login to Eat4Life</title>
     </head>
 
     <body>
@@ -23,10 +23,10 @@
         {% endwith %}
         {% block body %}{% endblock %}
         
-
         <li role="presentation" class="active"><a href="/">Home</a></li>
         <li role="presentation"><a href="#">Log In</a></li>
         <li role="presentation"><a href="signup">Sign Up</a></li>    
+    
     
         <form action="login" method="POST">
         {{ form.csrf_token }} 
@@ -34,67 +34,75 @@
                 <div class="login-html">
                     <input id="tab-1" type="radio" name="tab" class="sign-in" checked>
                         <label for="tab-1" class="tab"> Sign In </label>
-                    <input id="tab-2" type="radio" name="tab" class="sign-up">
-                        <label for="tab-2" class="tab"> Sign Up </label>
-                
+                   <input id="tab-2" type="radio" name="tab" class="sign-up">
+                        <label for="tab-2" class="tab"> <!-- Sign Up --> </label>
+                       
+                       
                     <div class="login-form">
                         <!-- Sign IN -->
                         <div class="sign-in-htm">
                             <div class="group">
                                 <label for="user" class="label"> Username </label>
-                                <input class="input" {{ form.username(size=20) }}
+                                <input id="user" class="input" {{ form.username(size=20) }}
                             </div>
                             <div class="group">
                                 <label for="pass" class="label"> Password </label>
-                                <input class="input" {{ form.password(size=20) }}        
+                                <input id="user" class="input" {{ form.password(size=20) }}        
                             </div>
                             <div class="group">
                                 <input type="submit" class="button" value="Sign In">
+                            
                             </div>
                             <div class="hr"></div>
                             <div class="foot-lnk"> <a href="#forgot">Forgot Password?</a> </div>
                         </div>                     
-                    
-                        <!-- Sign UP -->                   
+                <!--    </form> -->
+                
+                            
+                        <!-- Sign UP -->           
+                <!--    <form action="signup" method="POST">
                         <div class="sign-up-htm">
                             <div class="group">
                                 <label for="user" class="label"> Username </label>
-                                <input id="user" type="text" class="input">
+                                <input id="user" class="input" {{ form.username(size=20) }}
                             </div>
                             <div class="group">
                                 <label for="pass" class="label"> Password </label>
-                                <input id="pass" type="password" class="input" data-type="password">
+                                <input id="user" class="input" {{ form.password(size=20) }}
                             </div>
                             <div class="group">
                                 <label for="pass" class="label"> Repeat Password </label>
-                                <input id="pass" type="password" class="input" data-type="password">
+                                <input id="pass" class="input" > 
+
                             </div>
                             <div class="group">
                                 <label for="pass" class="label"> First name </label>
-                                <input id="pass" type="text" class="input">
+                                <input id="pass" class="input" >
                             </div>                
                             <div class="group">
                                 <label for="pass" class="label"> Last name </label>
-                                <input id="pass" type="text" class="input">
+                                <input id="pass" class="input" >
                             </div>     
                             <div class="group">
                                 <label for="pass" class="label"> Email address </label>
-                                <input id="pass" type="text" class="input">
+                                <input id="pass" class="input" >
                             </div>                                 
                             <div class="group">
                                 <label for="pass" class="label"> Phone number </label>
-                                <input id="pass" type="text" class="input">
+                                <input id="pass" class="input" >
                             </div>                                                     
                             <div class="group">
                                 <input type="submit" class="button" value="Sign Up">
                             </div>
+              
+                            
                             <div class="hr"></div>
                             <div class="foot-lnk">
                                 <label for="tab-1"> Already a Member? </label>
                             </div>
                                                         
                         </div>
-                    
+                    -->
                     </div> <!-- END of LOGIN FORM -->
                 </div>
             </div>
