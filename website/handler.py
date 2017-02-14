@@ -38,9 +38,9 @@ def login():
         return redirect(url_for('index'))
 
     flash_errors(form)
-    return render_template('login.html', form=form)
+    return render_template('signin.html', form=form)
 
-@site.route("/signup", methods=["GET", 'POST'])
+@site.route('/signup', methods=['GET', 'POST'])
 def sign_up():
     '''
     Handles new user sign ups
@@ -125,6 +125,7 @@ class LoginForm(Form):
     '''
     username = StringField('Username', [validators.Length(min=2, max=25)])
     password = PasswordField('Password',[validators.DataRequired()])
+
 
     def __init__(self, *args, **kwargs):
         '''
