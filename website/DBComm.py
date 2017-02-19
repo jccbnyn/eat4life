@@ -44,6 +44,8 @@ class DB:
             self.database = None
 
 
+#---------------------- Charity Event Functions ------------------------
+
     def get_user_by_id(self, user_id):
         """
         Get the user based on user ID.
@@ -262,6 +264,7 @@ class DB:
 
 
 #---------------------- Charity Event Functions ------------------------
+
     def get_allCharityEvents(self):
         """
         Args:
@@ -285,7 +288,113 @@ class DB:
             return allEvents
     
     
-    def         
+    def get_charityEvent_by_id(self, passedInCharityEventId):
+        """
+        Args:
+                passedInCharityEventId - The charity event's id
+        Returns:
+                The charity event object with given id
+        Raises:
+                Exception if no such charity event is found
+        """
+        # Create a new session and query for a user
+        session = loadSession()
+        charityEvent = session.query(CharityEvent).filter(CharityEvent.charityEventID == passedInCharityEventId).first()
+        session.close()
+        return charityEvent      
 	
+	
+    def create_charityEvent(self, new_eventName, new_dateTime, new_loc_streetAddr,
+            new_loc_city, new_loc_state, new_loc_zip, new_loc_country):
+        """ Creates a charity event and saves it in the database.
+
+        Args:
+                new: _name, _dateTime;
+                location: _streetAddress, _city, _state, _zipcode, _country
+        Returns:
+                A new charity event with the specified args in the user table.
+        Raises:
+                Exception if the charity event info was not saved properly.
+        """
+        # Can't have empty event name, dateTime, and location 
+        if str(new_eventName) == '':
+            raise Exception("Can't have empty event name")
+        if str(new_dateTime) == '':
+            raise Exception("Can't have empty dateTime")
+        if str(new_loc_streetAddr) == '':
+            raise Exception("Can't have empty street address")
+        if str(new_loc_city) == '':
+	    raise Exception("Can't have empty city name")
+        if str(new_loc_state) == '':
+	    raise Exception("Can't have empty state name")
+	if str(new_loc_zip) == '':
+	    raise Exception("Can't have empty zip code")
+	if str(new_loc_country) == '':
+            raise Exception("Can't have empty country name")				
+
+        # Create a new session
+        session = loadSession()
+        # Create a new user
+        new_charityEvent = CharityEvent(str(new_eventName),
+                str(new_dateTime),
+                str(new_loc_streetAddr),
+                str(new_loc_city),
+                str(new_loc_state),
+                str(new_loc_zip),
+                str(new_loc_country))
+        # Add new charity event
+        session.add(new_charityEvent)
+        # Commit the record in the database
+        session.commit()
+        # Check if it's saved properly
+        charityEvent = (session.query(CharityEvent).filter(
+            CharityEvent.charityEvent_name == new_eventName).first())
+
+        if charityEvent != None:
+            print '\nCreated charity event successfully\n'
+            session.close()
+            return charityEvent
+        else:
+            # Otherwise, charity event was not saved properly, rollback save
+            print '\nDid not create charity event\n'
+            session.rollback()
+            session.close()
+            raise Exception("Did not save correctly")	
+	
+
+    def delete_charityEvent(self, passedInCharityEventId):
+        """ This function deletes an existing charity event
+            in the database given a charity event id
+
+        Args:
+                The charity event id
+        Returns:
+                No object
+        Raises:
+                Exception if the passed-in charity event does not exist in the db
+        """
+        # Create a new session & query
+        session = loadSession()
+        charitEvent = session.query(CharityEvent).filter(CharityEvent.charityEventID == passedInCharityEventId)
+
+        # Check if user currently exists in db
+        if charityEvent.first() == None:
+            # if not, raise an Exception and close the session
+            session.close()
+            raise Exception("charity event id " + str(passedInCharityEventId) + " NOT found")
+        else:
+            charityEvent.delete()
+            session.commit()
+
+        # Verify that the row has been deleted
+        charityEvent = (session.query(CharityEvent).filter(
+            CharityEvent.charityEventID == passedInCharityEventId).first())
+
+        if user != None:
+            session.rollback()
+            session.close()
+            raise Exception("Charity Event Id "
+                    + str(passedICharityEventId)
+                    + " was not deleted. Rolling back")	
 
 
