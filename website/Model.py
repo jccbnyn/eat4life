@@ -54,7 +54,7 @@ class Charity(Base):
     __tablename__ = 'charity'
     # Here we define columns for the "charity" table
     charityID = Column(Integer, primary_key=True, nullable=False)
-    charityName = Column(String(length=30), nullable=False)
+    charityName = Column(String(length=30), unique=True, nullable=False)
     charityAddress = Column(String(length=30))
     charityEmail = Column(String(length=20))
     charityPhone = Column(String(length=20))

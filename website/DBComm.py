@@ -480,7 +480,7 @@ class DB:
         # Create a new session
         session = loadSession()
         # Query for all charities
-        allCharities = session.query(Charit).all()
+        allCharities = session.query(Charity).all()
         # Check if query was successful
         if allCharities == None:
             session.close()
@@ -518,7 +518,7 @@ class DB:
         """
         # Create a new session and query for a charity
         session = loadSession()
-        charity = session.query(CharityEvent).filter(CharityEvent.charityEventID == passedInCharityId).first()
+        charity = session.query(Charity).filter(Charity.charityID == passedInCharityId).first()
         session.close()
         return charity     
 
@@ -624,7 +624,7 @@ class DB:
             raise Exception("Charity Can't have empty address")
         if str(update_email) == '':
             raise Exception("Charity Can't have empty email")
-        if str(update_loc_city) == '':
+        if str(update_phone) == '':
             raise Exception("Charity Can't have empty phone number")
 
         # Create a new session & query
