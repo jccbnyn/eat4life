@@ -131,25 +131,27 @@ class CharityEvent(Base):
 		self.charityEvent_datetime, self.charityEvent_loc_streetAddr))
 
 
-class CharityEventAttendees(Base):
+class CharityEventInvitees(Base):
 	__tablename__ = 'charity_event_attendees'
-	charityEventAttendeesID = Column(Integer, primary_key=True, nullable=False)
-	charityEventAttendees_isHost = Column(Boolean, unique=False, default=False)
-	charityEventAttendees_charityEventID = Column(Integer, ForeignKey("charity_event.charityEventID"))
-	charityEventAttendees_userID = Column(Integer, ForeignKey("user.userID"))
+	charityEventInviteesID = Column(Integer, primary_key=True, nullable=False)
+	charityEventInvitees_isHost = Column(Boolean, unique=False, default=False)
+	charityEventInvitees_isAttending = Column(Boolean, unique=False, default=False)
+	charityEventInvitees_charityEventID = Column(Integer, ForeignKey("charity_event.charityEventID"))
+	charityEventInvitees_userID = Column(Integer, ForeignKey("user.userID"))
 	
 	# foreign keys
-	charityEventAttendees_User = relationship("User", foreign_keys=[charityEventAttendees_userID])
-	charityEventAttendees_CharityEvent = relationship("CharityEvent", foreign_keys=[charityEventAttendees_charityEventID])
+	charityEventInvitees_User = relationship("User", foreign_keys=[charityEventInvitees_userID])
+	charityEventInvitees_CharityEvent = relationship("CharityEvent", foreign_keys=[charityEventInvitees_charityEventID])
 	
-	def __init__(self, charityEventAttendees_isHost, charityEventAttendees_charityEventID, charityEventAttendees_userID):
-		self.charityEventAttendees_isHost = charityEventAttendees_isHost
-		self.charityEventAttendees_charityEventID = charityEventAttendees_charityEventID
-		self.charityEventAttendees_userID = charityEventAttendees_userID
+	def __init__(self, charityEventInvitees_isHost, charityEventInvitees_isAttending, charityEventInvitees_charityEventID, charityEventInvitees_userID):
+		self.charityEventInvitees_isHost = charityEventInvitees_isHost
+		self.charityEventInvitees_isAttending = charityEventInvitees_isAttending
+		self.charityEventInvitees_charityEventID = charityEventInvitees_charityEventID
+		self.charityEventInvitees_userID = charityEventInvitees_userID
 		
 	def __repr__(self):
-		return ('<CharityEventAttendees(%s, %d %d)>' % (self.charityEventAttendees_isHost, 
-		charityEventAttendees_charityEventID, charityEventAttendees_userID))
+		return ('<CharityEventInvitees(%s, %s, %d %d)>' % (self.charityEventAttendees_isHost, 
+		charityEventAttendees_isAttending, charityEventAttendees_charityEventID, charityEventAttendees_userID))
 	
 
 # Create all tables in the engine. This is equivalent to "Create Table"
