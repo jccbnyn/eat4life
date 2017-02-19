@@ -113,13 +113,13 @@ class DB:
         """
         # Can't have empty username, password, firstname, email
         if str(new_userName) == '':
-            raise Exception("Can't have empty username")
+            raise Exception("User Can't have empty username")
         if str(new_password) == '':
-            raise Exception("Can't have empty password")
+            raise Exception("User Can't have empty password")
         if str(new_firstName) == '':
-            raise Exception("Can't have empty firstname")
+            raise Exception("User Can't have empty firstname")
         if str(new_emailAddress) == '':
-            raise Exception("Can't have empty emailaddress")
+            raise Exception("User Can't have empty emailaddress")
 
         # Create a new session
         session = loadSession()
@@ -222,11 +222,11 @@ class DB:
         """
         # Can't have empty username, firstname, email
         if str(new_userName) == '':
-            raise Exception("Can't have empty username")
+            raise Exception("User Can't have empty username")
         if str(new_firstName) == '':
-            raise Exception("Can't have empty firstname")
+            raise Exception("User Can't have empty firstname")
         if str(new_email) == '':
-            raise Exception("Can't have empty email")
+            raise Exception("User Can't have empty email")
 
         # Create a new session & query
         session = loadSession()
@@ -317,19 +317,19 @@ class DB:
         """
         # Can't have empty event name, dateTime, and location 
         if str(new_eventName) == '':
-            raise Exception("Can't have empty event name")
+            raise Exception("Charity Event Can't have empty event name")
         if str(new_dateTime) == '':
-            raise Exception("Can't have empty dateTime")
+            raise Exception("Charity Event Can't have empty dateTime")
         if str(new_loc_streetAddr) == '':
-            raise Exception("Can't have empty street address")
+            raise Exception("Charity Event Can't have empty street address")
         if str(new_loc_city) == '':
-	    raise Exception("Can't have empty city name")
+	    raise Exception("Charity Event Can't have empty city name")
         if str(new_loc_state) == '':
-	    raise Exception("Can't have empty state name")
+	    raise Exception("Charity Event Can't have empty state name")
 	if str(new_loc_zip) == '':
-	    raise Exception("Can't have empty zip code")
+	    raise Exception("Charity Event Can't have empty zip code")
 	if str(new_loc_country) == '':
-            raise Exception("Can't have empty country name")				
+            raise Exception("Charity Event Can't have empty country name")				
 
         # Create a new session
         session = loadSession()
@@ -415,19 +415,19 @@ class DB:
         """
         # Can't have empty event name, dateTime, and location 
         if str(update_eventName) == '':
-            raise Exception("Can't have empty event name")
+            raise Exception("Charity Event Can't have empty event name")
         if str(update_dateTime) == '':
-            raise Exception("Can't have empty dateTime")
+            raise Exception("Charity Event Can't have empty dateTime")
         if str(update_loc_streetAddr) == '':
-            raise Exception("Can't have empty street address")
+            raise Exception("Charity Event Can't have empty street address")
         if str(update_loc_city) == '':
-            raise Exception("Can't have empty city name")
+            raise Exception("Charity Event Can't have empty city name")
         if str(update_loc_state) == '':
-            raise Exception("Can't have empty state name")
+            raise Exception("Charity Event Can't have empty state name")
 	if str(update_loc_zip) == '':
-            raise Exception("Can't have empty zip code")
+            raise Exception("Charity Event Can't have empty zip code")
 	if str(update_loc_country) == '':
-            raise Exception("Can't have empty country name")	
+            raise Exception("Charity Event Can't have empty country name")	
 
         # Create a new session & query
         session = loadSession()
@@ -535,13 +535,13 @@ class DB:
         """
         # Can't have empty charity name, address, email, and phone 
         if str(new_charityName) == '':
-            raise Exception("Can't have empty charity name")
+            raise Exception("Charity Can't have empty charity name")
         if str(new_address) == '':
-            raise Exception("Can't have empty charity address")
+            raise Exception("Charity Can't have empty charity address")
         if str(new_email) == '':
-            raise Exception("Can't have empty email address")
+            raise Exception("Charity Can't have empty email address")
         if str(new_phone) == '':
-            raise Exception("Can't have empty phone number")				
+            raise Exception("Charity Can't have empty phone number")				
 
         # Create a new session
         session = loadSession()
@@ -603,3 +603,59 @@ class DB:
                     + " was not deleted. Rolling back")
  
  
+    def update_charity(self, passedInCharityId, update_charityName, update_address, update_email, update_phone):
+        """ Updates an existing charity in the database
+
+        Args:
+                passedInCharityId - The charity to update
+                update_charityName - The charity's new name
+                update_address - The charity's new address
+                update_email- The charity's new email address
+                update_phone - The charity's new phone number
+        Returns:
+                The charity with the new information passed in
+        Raises:
+                Exception if the passedInCharityId does not exist in the db.
+        """
+        # Can't have empty charity name, address, email, and phone 
+        if str(update_charityName) == '':
+            raise Exception("Charity Can't have empty charity name")
+        if str(update_address) == '':
+            raise Exception("Charity Can't have empty address")
+        if str(update_email) == '':
+            raise Exception("Charity Can't have empty email")
+        if str(update_loc_city) == '':
+            raise Exception("Charity Can't have empty phone number")
+
+        # Create a new session & query
+        session = loadSession()
+        charity = (session.query(Charity).filter(
+            Charity.charityID == passedInCharityId).first())
+        # Check if charity currently exists in db
+        if charity == None:
+            session.close()
+            raise Exception("Charity Id "
+                    + str(passedInCharityId)
+                    + " does NOT exist. "
+                    + "Can't update a non-existent charity.")
+        else:
+            # Update charity row with new values
+            charity.charityName = str(update_charityName)
+            charity.charityAddress = str(update_address)
+            charity.charityEmail = str(update_email)
+            charity.charityPhone = str(update_phone)         
+            
+            # Save the update
+            session.commit()
+
+        # Verify that the update was successful
+        updated_charity = session.query(Charity).filter(
+                Charity.charityName == update_charityName).first()
+        if updated_charity == None:
+            session.rollback()
+            session.close()
+            raise Exception("Charity name " + str(update_charityName) + " not found.")
+        else:
+            session.close()
+            return updated_charity
+            
