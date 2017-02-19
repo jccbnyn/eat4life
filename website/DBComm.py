@@ -398,3 +398,76 @@ class DB:
                     + " was not deleted. Rolling back")	
 
 
+    def update_charityEvent(self, passedInCharityEventId, update_eventName, update_dateTime,
+            update_loc_streetAddr, update_loc_city, update_loc_state, update_loc_zip, update_loc_country):
+        """ Updates an existing charity event in the database
+
+        Args:
+                passedInCharityEventId - The charity event to update
+                update_eventName - The charity event's new name
+                update_dateTime - The charity event's new date and time
+                update_loc_streetAddr - The charity event's new street address
+                update_loc_city - The charity event's new city name
+                update_loc_state - The charity event's new state
+                update_loc_zip - charity event's new zip code
+                update_loc_country - charity event's new country
+        Returns:
+                The charity event with the new information passed in
+        Raises:
+                Exception if the passedInCharityEventId does not exist in the db.
+        """
+        # Can't have empty event name, dateTime, and location 
+        if str(update_eventName) == '':
+            raise Exception("Can't have empty event name")
+        if str(update_dateTime) == '':
+            raise Exception("Can't have empty dateTime")
+        if str(update_loc_streetAddr) == '':
+            raise Exception("Can't have empty street address")
+        if str(update_loc_city) == '':
+	    raise Exception("Can't have empty city name")
+        if str(update_loc_state) == '':
+	    raise Exception("Can't have empty state name")
+	if str(update_loc_zip) == '':
+	    raise Exception("Can't have empty zip code")
+	if str(update_loc_country) == '':
+            raise Exception("Can't have empty country name")	
+
+        # Create a new session & query
+        session = loadSession()
+        charityEvent = (session.query(CharityEvent).filter(
+            CharityEvent.charityEventID == passedInCharityEventId).first())
+
+        # Check if user currently exists in db
+        if charityEvent == None:
+            session.close()
+            raise Exception("Charity Event Id "
+                    + str(passedInCharityEventId)
+                    + " does NOT exist. "
+                    + "Can't update a non-existent charity event.")
+        else:
+            # Update charity event row with new values
+            charityEvent.charityEvent_name = str(update_eventName)
+            charityEvent.charityEvent_datetime = str(update_dateTime)
+            charityEvent.charityEvent_loc_streetAddr = str(update_loc_streetAddr)
+            charityEvent.charityEvent_loc_city = str(update_loc_city)
+            charityEvent.charityEvent_loc_state = str(update_loc_state)
+            charityEvent.charityEvent_loc_zipcode = str(update_loc_zip)
+            charityEvent.charityEvent_loc_country = str(update_loc_country)            
+            
+            # Save the update
+            session.commit()
+
+        # Verify that the update was successful
+        updated_charityEvent = session.query(CharityEvent).filter(
+                CharityEvent.charityEvent_name == update_eventName).first()
+
+        if updated_charityEvent == None:
+            session.rollback()
+            session.close()
+            raise Exception("Charity Event name " + str(update_eventName) + " not found.")
+        else:
+            session.close()
+            return updated_charityEvent
+
+
+
