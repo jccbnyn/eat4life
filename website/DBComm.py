@@ -259,3 +259,33 @@ class DB:
         else:
             session.close()
             return updated_user
+
+
+#---------------------- Charity Event Functions ------------------------
+    def get_allCharityEvents(self):
+        """
+        Args:
+                none
+        Returns:
+                All the charity events stored in the database.
+        Raises:
+                Exception if there are no charity events saved,
+                i.e., zero events, in the db
+        """
+        # Create a new session
+        session = loadSession()
+        # Query for all users
+        allEvents = session.query(CharityEvent).all()
+        # Check if query was successful
+        if allEvents == None:
+            session.close()
+            raise Exception("Charity Events not found.")
+        else:
+            session.close()
+            return allEvents
+    
+    
+    def         
+	
+
+
