@@ -8,14 +8,20 @@ from DBComm import DB
 # Import flask objects
 from flask import flash, abort, session, redirect, render_template, url_for
 
-# Import flask WTF Forms to handle login validation
+# Import WTForms to handle form templates
 from flask.ext.wtf import Form
+
+# Import WTForms helpers
 from wtforms import validators
-from wtforms.fields import TextField, StringField, PasswordField
+from wtforms.fields import DateField, DateTimeField, HiddenField, TextField, \
+       SelectMultipleField, StringField, PasswordField
 from wtforms.validators import Required
 
 # Import ItsDangerous for crypyo signing IDs
 from itsdangerous import URLSafeSerializer, BadSignature
+
+# Import datetime object
+from datetime import datetime
 
 @site.route('/account', methods=['GET'])
 def account_home():
@@ -40,8 +46,28 @@ def account_details():
         flash(u'You must be logged in first!')
         return redirect(url_for('login'))
 
-
     return render_template('account_details.html')
+
+@site.route('/account/host-a-dinner', methods=['GET', 'POST'])
+def hostdinner():
+    '''
+    Handles host a dinner page
+    '''
+    # Make sure that the session is valid
+    if not 'user_id' in session:
+        flash(u'You must be logged in first!')
+        return redirect(url_for('login'))
+
+    form = HostEventForm()
+
+    if form.validate_on_submit():
+        # TODO: Add a nice flash message, detailing the event & time
+        flash(u'Successfully hosted a dinner for in as %s' % form.event.eventDate)
+        # TODO: Add a landing page for hosted events
+        return redirect(url_for('hosted-events'))
+
+    flash_errors(form)
+    return render_template('host-a-dinner.html', form=form)
 
 @site.route('/', methods=['GET'])
 def index():
@@ -168,6 +194,78 @@ def flash_errors(form):
                 u"Error in the %s field - %s"
                 % (getattr(form, field).label.text,error))
 
+class HostEventForm(Form):
+    '''
+    Host event form class for validating a host event data
+    '''
+
+    event_date = DateField(
+        "Event Date", format="%m/%d/%Y",
+        validators=[validators.DataRequired()])
+
+    event_time = DateTimeField(
+        "Event Time", format="%I:%M %p",
+        validators=[validators.DataRequired()])
+
+    event_location_address = StringField('Address', [
+        validators.DataRequired(),
+        validators.Length(min=2, max=35)])
+
+    event_location_city = TextField('City', [
+        validators.DataRequired(),
+        validators.Length(min=2, max=35)])
+
+    # TODO: Define a dropdown with the states two char value
+    event_location_state = TextField('State', [
+        validators.DataRequired(),
+        validators.Length(min=2, max=35)])
+
+    event_location_zip = StringField('Zip', [validators.Length(min=5, max=5)])
+
+    # Generate a users list for invitees
+    db = DB()
+    db.connect()
+    usersList = [(user.userName, user.firstName + " " + user.lastName)
+            for user in db.getAllVerifiedUsers()]
+    db.disconnect()
+
+    event_invitees_list = SelectMultipleField('Invitee List',  choices=usersList)
+
+
+    def __init__(self, *args, **kwargs):
+        '''
+        Initializer for event, no event is default.
+        '''
+        Form.__init__(self, *args, **kwargs)
+        self.event = None
+
+    def validate(self):
+        '''
+        Handles validating the event form data entered in.
+        '''
+
+        # Validate our form first
+        rv = Form.validate(self)
+        if not rv:
+            return False
+
+        db = DB()
+        db.connect()
+        # Make sure there's no event already in place
+        # TODO: Add query check if there's another event
+
+        # If there's no event in place, create a new event
+        # TODO: Add a query to create a new event
+        # new_event = <CREATE_QUERY>
+        new_event = None
+
+        # TODO: Create function to add the users/invitees as well
+
+        db.disconnect()
+
+        # Set the login form's user
+        self.event = new_event
+        return True
 
 class LoginForm(Form):
     '''

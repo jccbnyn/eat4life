@@ -31,8 +31,7 @@ class DB:
                 self.database = engine.connect()
             else:
                 # TODO: fix this later
-                engine = create_engine('sqlite:///' + str(host),
-                        echo=True)
+                engine = create_engine('sqlite:///' + str(host), echo=True)
                 self.database = engine.connect()
         except:
             raise Exception("Can't connect to the database")
@@ -95,6 +94,19 @@ class DB:
             session.close()
             return allUsers
 
+    def getAllVerifiedUsers(self):
+        """
+        Function returns all active users in the database.
+        """
+
+        # Create a new session
+        session = loadSession()
+        # Query for all verified users
+        users = (session.query(User).filter(
+            User.isEmailVerified == True).all())
+
+        session.close()
+        return users
 
     def create_user(self, new_userName, new_password, new_firstName,
             new_lastName, new_emailAddress, new_phoneNumber):
@@ -259,3 +271,6 @@ class DB:
         else:
             session.close()
             return updated_user
+
+
+# Helper functions to convert Objects into readable items

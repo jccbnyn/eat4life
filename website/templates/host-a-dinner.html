@@ -1,0 +1,96 @@
+<html>
+    <head>
+        <title>Eat4Life - {{ title }}</title>
+        
+        <link rel="stylesheet" href="/static/jquery-ui.min.css">
+        <link rel="stylesheet" href="/static/jquery.timepicker.css">
+        
+        <script src="/static/jquery-1.12.4.min.js"></script>
+	    <script src="/static/jquery-ui.min.js"></script>
+        <script src="/static/jquery.timepicker.min.js"></script>
+  
+<!-- 
+ WORKS 
+          <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+
+  <script type="text/javascript" src="/static/jquery.timepicker.min.js"></script>
+  <link rel="stylesheet" type="text/css" href="/static/jquery.timepicker.css" />
+
+  -->
+
+    </head>
+    <body>
+        {% with messages = get_flashed_messages() %}
+          {% if messages %}
+            <ul class=flashes>
+            {% for message in messages %}
+              <li>{{ message }}</li>
+            {% endfor %}
+            </ul>
+          {% endif %}
+        {% endwith %}
+        {% block body %}{% endblock %}
+        
+        <li role="presentation" class="active"><a href="/">Home</a></li>
+    </body>
+
+    <form action="host-a-dinner" method="POST">
+        {{ form.csrf_token }} 
+        <div>
+            <div>
+                <div>
+                    <h1>Host a dinner</h1>
+                    <h2>Time & Place</h2>
+                </div>
+                <div>
+                    {{ form.event_date.label }} 
+                    {{ form.event_date(class="datetimeselector", size=5) }}
+                    
+                    {{ form.event_time.label }} 
+                    {{ form.event_time(class="timeselector", size=5) }}
+                    
+                    <br /> 
+                    {{ form.event_location_address.label }}
+                    {{ form.event_location_address(size=10) }}
+                    <br />
+                    {{ form.event_location_city.label }}
+                    {{ form.event_location_city(size=10) }}
+                    <br />
+                    {{ form.event_location_state.label }}
+                    {{ form.event_location_state(size=2) }}
+                    
+                    {{ form.event_location_zip.label }}
+                    {{ form.event_location_zip(size=2) }}
+                </div>
+                <div>
+                    <h2>Invite guests</h2>
+                </div>
+                <div>
+                    {{ form.event_invitees_list.label }}
+                    <br />
+                    {{ form.event_invitees_list }}
+                </div>
+                <div>
+                    <input type="submit" value="Create event"
+                        class="btn btn-primary btn-large btn-block" >
+
+                </div>
+            </div>
+        </div>
+    </form>
+</html>
+
+
+<script>
+    $(function() {
+        // On page/document loaded
+	    // Set date picker
+        $(".datetimeselector").datepicker({
+            minDate: new Date(),
+            maxDate: new Date(new Date().setFullYear(new Date().getFullYear() + 1))}
+        );
+        
+        $('.timeselector').timepicker();
+    });
+</script>
+
