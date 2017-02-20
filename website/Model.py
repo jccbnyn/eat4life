@@ -1,10 +1,11 @@
-from sqlalchemy import Column, Integer, String, Float, DateTime, \
+from sqlalchemy import Column, Integer, String, Float, DateTime, Date, \
         Boolean, create_engine, ForeignKey, func
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship, backref
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.schema import ForeignKeyConstraint
 import bcrypt
+import datetime
 
 # Create an engine that stores data in the local directory
 engine = create_engine('sqlite:///model.db', echo=True)
@@ -105,19 +106,18 @@ class CharityEvent(Base):
 	# Columns for the "charity_event" table
 	charityEventID = Column(Integer, primary_key=True, nullable=False)
 	charityEvent_name = Column(String(length=30))
-	charityEvent_datetime = Column(DateTime, default=func.now())
+	charityEvent_datetime = Column(DateTime)
 	charityEvent_loc_streetAddr = Column(String(length=30))
 	charityEvent_loc_city = Column(String(length=30))
 	charityEvent_loc_state = Column(String(length=2))
 	charityEvent_loc_zipcode = Column(String(length=5))
 	charityEvent_loc_country = Column(String(length=30))
-	charityEvent_charityID = Column(Integer, ForeignKey("charity.charityID"))
-	
-	# foreign key
-	charityEvent_Charity = relationship("Charity", foreign_keys=[charityEvent_charityID])
-	
+	# parent id:
+        charityEvent_charityId = Column(Integer, ForeignKey('charity.charityID'))
+
 	def __init__(self, charityEvent_name, charityEvent_datetime, charityEvent_loc_streetAddr, 
-	charityEvent_loc_city, charityEvent_loc_state, charityEvent_loc_zipcode, charityEvent_loc_country):
+	charityEvent_loc_city, charityEvent_loc_state, charityEvent_loc_zipcode, charityEvent_loc_country, charityEvent_charityId):
+
 		self.charityEvent_name = charityEvent_name
 		self.charityEvent_datetime = charityEvent_datetime
 		self.charityEvent_loc_streetAddr = charityEvent_loc_streetAddr
@@ -125,10 +125,11 @@ class CharityEvent(Base):
 		self.charityEvent_loc_state = charityEvent_loc_state
 		self.charityEvent_loc_zipcode = charityEvent_loc_zipcode
 		self.charityEvent_loc_country = charityEvent_loc_country
-		
+		self.charityEvent_charityId = charityEvent_charityId
+
 	def __repr__(self):
-		return ('<CharityEvent(%s, %s, %s)>' % (self.charitEvent_name, 
-		self.charityEvent_datetime, self.charityEvent_loc_streetAddr))
+		return ('<CharityEvent(%s, %s, %s, %s)>' % (self.charityEvent_name, 
+		self.charityEvent_datetime, self.charityEvent_loc_streetAddr, self.charityEvent_charityId))
 
 
 class CharityEventInvitees(Base):

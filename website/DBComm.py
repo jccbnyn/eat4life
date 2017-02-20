@@ -304,17 +304,16 @@ class DB:
 	
 	
     def create_charityEvent(self, new_eventName, new_dateTime, new_loc_streetAddr,
-            new_loc_city, new_loc_state, new_loc_zip, new_loc_country):
+            new_loc_city, new_loc_state, new_loc_zip, new_loc_country, charityId):
         """ Creates a charity event and saves it in the database.
 
         Args:
-                new: _name, _dateTime;
-                location: _streetAddress, _city, _state, _zipcode, _country
+                The charity event's name; date time; location as in street address, city name, state, zip code, country; and the id of the charity this event is associated with.
         Returns:
                 A new charity event with the specified args in the user table.
         Raises:
                 Exception if the charity event info was not saved properly.
-        """
+        """        
         # Can't have empty event name, dateTime, and location 
         if str(new_eventName) == '':
             raise Exception("Charity Event Can't have empty event name")
@@ -329,18 +328,22 @@ class DB:
 	if str(new_loc_zip) == '':
 	    raise Exception("Charity Event Can't have empty zip code")
 	if str(new_loc_country) == '':
-            raise Exception("Charity Event Can't have empty country name")				
-
+            raise Exception("Charity Event Can't have empty country name")
+        if(str(charityId) == ''):
+            raise Exception("Charity Event Can't have an empty charity id")
+            
         # Create a new session
         session = loadSession()
         # Create a new charity event
         new_charityEvent = CharityEvent(str(new_eventName),
-                str(new_dateTime),
+                new_dateTime,
                 str(new_loc_streetAddr),
                 str(new_loc_city),
                 str(new_loc_state),
                 str(new_loc_zip),
-                str(new_loc_country))
+                str(new_loc_country),
+                charityId)
+                
         # Add new charity event
         session.add(new_charityEvent)
         # Commit/Save the record in the database
@@ -348,7 +351,6 @@ class DB:
         # Check if it's saved properly
         charityEvent = (session.query(CharityEvent).filter(
             CharityEvent.charityEvent_name == new_eventName).first())
-
         if charityEvent != None:
             print '\nCreated charity event successfully\n'
             session.close()
