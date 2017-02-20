@@ -128,7 +128,7 @@ class CharityEvent(Base):
 		self.charityEvent_charityId = charityEvent_charityId
 
 	def __repr__(self):
-		return ('<CharityEvent(%s, %s, %s, %s)>' % (self.charityEvent_name, 
+		return ('<CharityEvent(%s, %s, %s, %d)>' % (self.charityEvent_name, 
 		self.charityEvent_datetime, self.charityEvent_loc_streetAddr, self.charityEvent_charityId))
 
 

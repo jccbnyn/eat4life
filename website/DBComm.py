@@ -376,7 +376,7 @@ class DB:
         """
         # Create a new session & query
         session = loadSession()
-        charityEvent = session.query(CharityEvent).filter(CharityEvent.charityEvent_name == passedInCharityEventId)
+        charityEvent = session.query(CharityEvent).filter(CharityEvent.charityEventID == passedInCharityEventId)
         # Check if charity event currently exists in db
         if charityEvent.first() == None:
             # if not, raise an Exception and close the session
@@ -445,7 +445,7 @@ class DB:
         else:
             # Update charity event row with new values
             charityEvent.charityEvent_name = str(update_eventName)
-            charityEvent.charityEvent_datetime = str(update_dateTime)
+            charityEvent.charityEvent_datetime = update_dateTime
             charityEvent.charityEvent_loc_streetAddr = str(update_loc_streetAddr)
             charityEvent.charityEvent_loc_city = str(update_loc_city)
             charityEvent.charityEvent_loc_state = str(update_loc_state)
