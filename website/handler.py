@@ -1,5 +1,5 @@
 # Import the site
-from website import site, mail
+from website import site, mail, login_manager
 
 # Import DB objects
 from Model import User, Charity, CharityMember
@@ -16,6 +16,10 @@ from wtforms import validators
 from wtforms.fields import DateField, DateTimeField, HiddenField, TextField, \
        SelectMultipleField, StringField, PasswordField
 from wtforms.validators import Required
+from wtforms import widgets
+
+from flask.ext.login import UserMixin, login_required, \
+        login_user, logout_user
 
 # Import ItsDangerous for crypyo signing IDs
 from itsdangerous import URLSafeSerializer, BadSignature
@@ -24,45 +28,32 @@ from itsdangerous import URLSafeSerializer, BadSignature
 from datetime import datetime
 
 @site.route('/account', methods=['GET'])
+@login_required
 def account_home():
     '''
     The user account's home page
     '''
-    # Make sure that the session is valid
-    if not 'user_id' in session:
-        flash(u'You must be logged in first!')
-        return redirect(url_for('login'))
-
-    # Validate that the user ID is for an valid user
-    # TODO: Add check that the session's user ID is valid
     return render_template('account_home.html')
 
 @site.route('/account/details', methods=['GET', 'POST'])
+@login_required
 def account_details():
     '''
     Account details page. Allows user to update information.
     '''
-    if not 'user_id' in session:
-        flash(u'You must be logged in first!')
-        return redirect(url_for('login'))
-
     return render_template('account_details.html')
 
 @site.route('/account/host-a-dinner', methods=['GET', 'POST'])
+@login_required
 def hostdinner():
     '''
     Handles host a dinner page
     '''
-    # Make sure that the session is valid
-    if not 'user_id' in session:
-        flash(u'You must be logged in first!')
-        return redirect(url_for('login'))
-
     form = HostEventForm()
-
     if form.validate_on_submit():
         # TODO: Add a nice flash message, detailing the event & time
-        flash(u'Successfully hosted a dinner for in as %s' % form.event.eventDate)
+        flash(u'Successfully hosted a dinner for in as %s'
+                % form.event.eventDate)
         # TODO: Add a landing page for hosted events
         return redirect(url_for('hosted-events'))
 
@@ -74,10 +65,6 @@ def index():
     '''
     Home page
     '''
-    # If there's a user's session, redirect to account
-    if 'user_id' in session:
-        # TODO: Validate user ID
-        return redirect(url_for('account_home'))
 
     return render_template('index.html', title='Home')
 
@@ -87,28 +74,24 @@ def login():
     Handles active user log ins. Checks if
     user is already logged in.
     '''
-    if 'user_id' in session:
-        # User already has session, redirect to account
-        flash(u'You are already logged in!')
-        return redirect(url_for('account_home'))
 
     form = LoginForm()
     if form.validate_on_submit():
         print 'VALID LOGIN'
         flash(u'Successfully logged in as %s' % form.user.userName)
-        session['user_id'] = form.user.userID
+        login_user(form.user)
         return redirect(url_for('account_home'))
 
     flash_errors(form)
     return render_template('login.html', form=form)
 
 @site.route('/logout', methods=['GET'])
+@login_required
 def logout():
     '''
     Handles logging out the active user
     '''
-    # Remove the user ID from session
-    session.pop('user_id', None)
+    logout_user()
     return redirect(url_for('index'))
 
 @site.route("/signup", methods=["GET", 'POST'])
@@ -116,11 +99,6 @@ def sign_up():
     '''
     Handles new user sign ups
     '''
-    # Check if user is already in session
-    if 'user_id' in session:
-        # Cannot sign up if on your account
-        flash (u'Please log out to create a new account.')
-        return redirect(url_for('account_home'))
 
     form = SignupForm()
     if form.validate_on_submit():
@@ -134,7 +112,8 @@ def sign_up():
 
         mail.sendMail(form.user.emailAddress,
                 'Eat4Life - Verification Required',
-                'Please verify your email: http://localhost:5000/activate/' + url)
+                'Please verify your email: http://localhost:5000/activate/'
+                + url)
 
         return redirect(url_for('index'))
 
@@ -194,6 +173,25 @@ def flash_errors(form):
                 u"Error in the %s field - %s"
                 % (getattr(form, field).label.text,error))
 
+@login_manager.user_loader
+def user_loader(user_id):
+    """
+    Function needs to be defined for the LoginManager.
+    Function expects a user ID, returns a User class object.
+    """
+    db = DB()
+    return db.get_user_by_id(user_id)
+
+class MultiCheckboxField(SelectMultipleField):
+    """
+    A multiple-select, except displays a list of checkboxes.
+
+    Iterating the field will produce subfields, allowing custom rendering of
+    the enclosed checkbox fields.
+    """
+    widget = widgets.ListWidget(prefix_label=False)
+    option_widget = widgets.CheckboxInput()
+
 class HostEventForm(Form):
     '''
     Host event form class for validating a host event data
@@ -204,33 +202,46 @@ class HostEventForm(Form):
         validators=[validators.DataRequired()])
 
     event_time = DateTimeField(
-        "Event Time", format="%I:%M %p",
+        "Event Time", format="%I:%M%p",
         validators=[validators.DataRequired()])
 
     event_location_address = StringField('Address', [
         validators.DataRequired(),
-        validators.Length(min=2, max=35)])
+        validators.Length(min=2, max=35,
+            message="Address must be 2-35 characters long.")])
 
     event_location_city = TextField('City', [
         validators.DataRequired(),
-        validators.Length(min=2, max=35)])
+        validators.Length(
+            min=2, max=35,
+            message="City must be 2-35 characters long.")])
 
     # TODO: Define a dropdown with the states two char value
     event_location_state = TextField('State', [
         validators.DataRequired(),
         validators.Length(min=2, max=35)])
 
-    event_location_zip = StringField('Zip', [validators.Length(min=5, max=5)])
+    event_location_zip = StringField('Zip',
+            [validators.Length(min=5, max=5,
+                message="Zip code must be 5 digits long")])
 
     # Generate a users list for invitees
     db = DB()
     db.connect()
     usersList = [(user.userName, user.firstName + " " + user.lastName)
             for user in db.getAllVerifiedUsers()]
+
+    charitiesList = [(str(charity.charityID), charity.charityName)
+            for charity in db.getAllCharities()]
+
     db.disconnect()
 
-    event_invitees_list = SelectMultipleField('Invitee List',  choices=usersList)
+    event_invitees_list = MultiCheckboxField('Invitees',
+            choices=usersList)
 
+    event_charities_list = MultiCheckboxField('Charities',
+            choices=charitiesList,
+            option_widget = widgets.CheckboxInput())
 
     def __init__(self, *args, **kwargs):
         '''
@@ -248,6 +259,13 @@ class HostEventForm(Form):
         rv = Form.validate(self)
         if not rv:
             return False
+
+        # This is how you fetch the invitees & charities selection
+        # Returns as a list
+        #print "%s" % self.event_invitees_list.data
+        #print "%s" % self.event_charities_list.data
+
+        return False
 
         db = DB()
         db.connect()
@@ -374,3 +392,4 @@ class SignupForm(Form):
         # Set the login form's user
         self.user = new_user
         return True
+

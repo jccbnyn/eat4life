@@ -272,5 +272,48 @@ class DB:
             session.close()
             return updated_user
 
+    def createNewCharity(self, charity_name, charity_address,
+            charity_email, charity_phone):
+        '''
+        Function creates a new charity
+        '''
 
-# Helper functions to convert Objects into readable items
+        # Create a new session
+        session = loadSession()
+        # Create a new charity
+        new_charity = Charity(charity_name, charity_address,
+                charity_email, charity_phone)
+
+        # Add new charity
+        session.add(new_charity)
+        # Commit the record in the database
+        session.commit()
+        # Check if it's saved properly
+        new_charity=(session.query(Charity).filter(
+            Charity.charityName == charity_name).first())
+
+        if new_charity != None:
+            print '\nCreated new charity successfully\n'
+            session.close()
+            return new_charity
+        else:
+            # Otherwise, new charity was not saved properly, rollback save
+            print '\nDid not create the charity\n'
+            session.rollback()
+            session.close()
+            raise Exception("Did not save correctly")
+
+    def getAllCharities(self):
+        """
+        Function returns all charities
+        """
+
+        # Create a new session
+        session = loadSession()
+        # Query for all charities
+        charities = (session.query(Charity).all())
+
+        session.close()
+        return charities
+
+

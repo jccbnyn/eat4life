@@ -17,4 +17,9 @@ csrf.init_app(site)
 from Mail import MailManager
 mail = MailManager(site)
 
+# Create a login manager for the site
+from flask.ext.login import LoginManager
+login_manager = LoginManager()
+login_manager.init_app(site)
+
 from website import handler

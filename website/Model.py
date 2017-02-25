@@ -49,6 +49,34 @@ class User(Base):
                 password.encode('utf-8'), self.password.encode('utf-8'))
         return self.password == pwhash
 
+    def is_active(self):
+        """
+        True, as all users are active.
+        """
+        # TODO: We must handle the logic for whether or not the user is
+        # currently active
+        return True
+
+    def get_id(self):
+        """
+        Returns the user's ID
+        """
+        return self.userID
+
+    def is_authenticated(self):
+        """
+        Return True if the user is authenticated.
+        """
+        # TODO: We must add a user login table to handle user logins and save
+        # to the DB whether or not the user has an authenticated session
+        return true
+
+    def is_anonymous(self):
+        """
+        Returns False (anonymous users aren't supported)
+        """
+        return False
+
 
 class Charity(Base):
     __tablename__ = 'charity'

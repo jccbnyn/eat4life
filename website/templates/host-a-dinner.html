@@ -8,15 +8,6 @@
         <script src="/static/jquery-1.12.4.min.js"></script>
 	    <script src="/static/jquery-ui.min.js"></script>
         <script src="/static/jquery.timepicker.min.js"></script>
-  
-<!-- 
- WORKS 
-          <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
-
-  <script type="text/javascript" src="/static/jquery.timepicker.min.js"></script>
-  <link rel="stylesheet" type="text/css" href="/static/jquery.timepicker.css" />
-
-  -->
 
     </head>
     <body>
@@ -71,10 +62,20 @@
                     {{ form.event_invitees_list }}
                 </div>
                 <div>
+                    <h2>Select charities</h2>
+                </div>
+                <div>
+                    {{ form.event_charities_list.label }}
+                    <br />
+                    {{ form.event_charities_list }}
+                </div>
+                <div>
                     <input type="submit" value="Create event"
                         class="btn btn-primary btn-large btn-block" >
 
                 </div>
+
+
             </div>
         </div>
     </form>
@@ -84,13 +85,18 @@
 <script>
     $(function() {
         // On page/document loaded
-	    // Set date picker
+	    
+        // Set date selector
         $(".datetimeselector").datepicker({
             minDate: new Date(),
             maxDate: new Date(new Date().setFullYear(new Date().getFullYear() + 1))}
         );
-        
-        $('.timeselector').timepicker();
+
+        // Set time selector 
+        $('.timeselector').timepicker({
+            'disableTimeRanges':
+            [['12am', '7am'], ['10pm', '11:00pm']]
+            });
     });
 </script>
 
