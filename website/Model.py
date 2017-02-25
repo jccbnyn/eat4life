@@ -154,14 +154,19 @@ class CharityEventInvitee(Base):
         
         def __init__(self):
             self.charityEventInvitee_isAttending = False
+            self.charityEventInvitee_isHost = False
 
         def get_isAttending(self):
-            print "getter of isAttending called"
             return self.charityEventInvitee_isAttending
         
+        def get_isHost(self):
+            return self.charityEventInvitee_isHost
+        
         def set_isAttending(self, value):
-            print "setter of isAttending called"
             self.charityEventInvitee_isAttending = value
+
+        def set_isHost(self, value):
+            self.charityEventInvitee_isHost = value
 
 	def __repr__(self):
 		return ('<CharityEventInvitee(%s, %s, %d %d)>' % (self.charityEventAttendee_isHost, 
