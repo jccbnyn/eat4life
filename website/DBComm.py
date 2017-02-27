@@ -662,8 +662,10 @@ class DB:
             return updated_charity
 
 
-#------------------ Charity Event Invitees Functions -------------------            
-
+#------------------ Charity Event Invitees Functions -------------------         
+   
+        # TODO: when no such event or user exists, it should not create the invitee.
+        # TODO: investigate foreign key relationships
     def create_charityEventInvitee(self, charityEventId, userId, user_isHost, user_isAttending):
         """
         Args:
@@ -693,12 +695,6 @@ class DB:
                 userId,
                 user_isHost,
                 user_isAttending)
-        print "charityEvent Id " + str(charityEventId)
-        print "user Id " + str(userId)
-        print "is Host " + str(user_isHost)
-        print "is Attending " + str(user_isAttending)
-        print "\t\ncharity event invitee : " + str(charityEventInvitee)
-
         # Add new charity event invitee
         session.add(charityEventInvitee)
         # Commit/Save the record in the database
@@ -717,27 +713,28 @@ class DB:
             session.close()
             raise Exception("Charity Event Invitee Did not save correctly")	
 	
-
-    #~ def get_allCharityEventInvitees(self, passedInCharityEventId):
-        #~ """
-        #~ Args:
-                #~ passedInCharityEventId - The id of the charity event
-        #~ Returns:
-                #~ All the invited people for the specified charity event.
-        #~ Raises:
-                #~ Exception if there is no such charity event found in the db.
-        #~ """
-        #~ # Create a new session
-        #~ session = loadSession()
-        #~ # Query for the passed in charity event
-        #~ charityEvent = session.query(CharityEvent).filter(CharityEvent.charityEventID == passedInCharityEventId).first()
-        #~ # Check if query was successful
-        #~ if charityEvent == None:
-            #~ session.close()
-            #~ raise Exception("\nCharity Event NOT Found.\n")
-        #~ else:
-            #~ session.close()
-            #~ return charityEvent
-            
+    # TODO:
+    #~ def get_allUpcomingCharityEvents():
+    def get_allCharityEventInvitees(self):
+        """
+        Args:
+                none
+        Returns:
+                All the charities event invitees stored in the database.
+        Raises:
+                Exception if there are no charities event invitees saved,
+                in the db
+        """
+        # Create a new session
+        session = loadSession()
+        # Query for all invitees
+        allInvitees = session.query(CharityEventInvitee).all()
+        # Check if query was successful
+        if allInvitees == None:
+            session.close()
+            raise Exception("CharityEvent Invitee not found.")
+        else:
+            session.close()
+            return allInvitees
 
             

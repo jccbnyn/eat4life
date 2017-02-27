@@ -128,8 +128,9 @@ class CharityEvent(Base):
 		self.charityEvent_charityId = charityEvent_charityId
 
 	def __repr__(self):
-		return ('<CharityEvent(%s, %s, %s, %d)>' % (self.charityEvent_name, 
-		self.charityEvent_datetime, self.charityEvent_loc_streetAddr, self.charityEvent_charityId))
+		return ('<CharityEvent(%d, %s, %s, %s, %d)>' % (self.charitEventID,
+        self.charityEvent_name, self.charityEvent_datetime,
+        self.charityEvent_loc_streetAddr, self.charityEvent_charityId))
 
 
 class CharityEventInvitee(Base):
@@ -148,7 +149,7 @@ class CharityEventInvitee(Base):
 		self.isHost = charityEventInvitee_isHost        
 		self.isAttending = charityEventInvitee_isAttending            
 
-        
+        # TODO: it doesn't like it when you uncomment this
         #~ def __init__(self):
             #~ self.charityEventInvitee_isAttending = False
             #~ self.charityEventInvitee_isHost = False
@@ -166,8 +167,8 @@ class CharityEventInvitee(Base):
             self.isHost = value
 
 	def __repr__(self):
-		return ('<CharityEventInvitee(%d, %d, %s, %s)>' % (self.charityEventID,
-            self.userID, self.isHost, 
+		return ('<CharityEventInvitee(%d, %d, %d, %s, %s)>' % (self.charityEventInviteeID,
+            self.charityEventID, self.userID, self.isHost, 
             self.isAttending))
 	
 
