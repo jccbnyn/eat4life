@@ -3,7 +3,6 @@
         <title>Eat4Life - {{ title }}</title>
     </head>
     <body>
-
         <h1>Hello, welcome to Eat 4 Life!</h1>
         {% with messages = get_flashed_messages() %}
           {% if messages %}
@@ -16,8 +15,9 @@
         {% endwith %}
         {% block body %}{% endblock %}
         
-        <li role="presentation" class="active"><a href="/">Home</a></li>
-        <li role="presentation"><a href="login">Log In</a></li>
-        <li role="presentation"><a href="signup">Sign Up</a></li>
+        <li role="presentation" class="active"><a href="account">Home</a></li>
+        <li role="presentation" class="active"><a href="account/details">Account Details</a></li>
+        <li role="presentation" class="active"><a href="account/host-a-dinner">Host a Dinner</a></li>
+        <li role="presentation"><a href="logout">Log out</a></li>
     </body>
 </html>

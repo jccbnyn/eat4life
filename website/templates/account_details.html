@@ -5,6 +5,7 @@
         <title>Eat4Life - {{ title }}</title>
     </head>
     <body>
+        <h1>Hello, welcome to Eat 4 Life!</h1>
         {% with messages = get_flashed_messages() %}
           {% if messages %}
             <ul class=flashes>
@@ -16,10 +17,10 @@
         {% endwith %}
         {% block body %}{% endblock %}
 
-        
-        <li role="presentation" class="active"><a href="/">Home</a></li>
-        <li role="presentation"><a href="login">Log In</a></li>
-        <li role="presentation"><a href="signup">Sign Up</a></li>
+        <li role="presentation" class="active"><a href="account_home">Home</a></li>
+        <li role="presentation" class="active"><a href="account_details">Account Details</a></li>
+        <li role="presentation"><a href="logout">Log out</a></li>
+
     </body>
 
     <form action="signup" method="POST">
@@ -32,14 +33,13 @@
                 <div class="login-form">
                     {{ form.firstname.label }} {{ form.firstname(size=20) }}
                     {{ form.lastname.label }} {{ form.lastname(size=20) }}
-                    {{ form.email.label }} {{ form.email(size=20) }}
                     {{ form.phone.label }} {{ form.phone(size=20) }}
-
-                    {{ form.username.label }} {{ form.username(size=20) }}
-                    {{ form.password.label }} {{ form.password(size=20) }}
+                    
+                    {{ form.old_password.label }} {{ form.old_password(size=20) }}
+                    {{ form.new_password.label }} {{ form.new_password(size=20) }}
                     {{ form.confirm.label }} {{ form.confirm(size=20) }}
                     <input type="submit"
-                        value="Sign Up"
+                        value="Update"
                         class="btn btn-primary btn-large btn-block" >
                     <br>
                 </div>

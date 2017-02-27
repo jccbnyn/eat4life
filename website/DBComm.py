@@ -1,5 +1,6 @@
 # Import the ORM objects from Model.py
-from Model import User, Charity, CharityMember, CharityEvent, CharityEventInvitee, loadSession
+from Model import User, Charity, CharityMember, CharityEvent, \
+        CharityEventInvitee, loadSession
 
 # Import the database conn. obj. from SQLAlchemy
 from sqlalchemy import create_engine
@@ -20,7 +21,7 @@ class DB:
     def connect(self, host = 'localhost'):
         """
         Args:
-        
+
         Returns:
                 No object
         Raises:
@@ -97,6 +98,23 @@ class DB:
         else:
             session.close()
             return allUsers
+
+
+    def getAllVerifiedUsers(self):
+        '''
+        Gets all verified users
+        '''
+        # Create a new session
+        session = loadSession()
+        # Query for all users
+        allVerifiedUsers = session.query(User).filter(User.isEmailVerified == True)
+        # Check if query was successful
+        if allVerifiedUsers == None:
+            session.close()
+            raise Exception("Verified Users not found.")
+        else:
+            session.close()
+            return allVerifiedUsers
 
 
     def create_user(self, new_userName, new_password, new_firstName,
@@ -276,7 +294,7 @@ class DB:
         """
         # Create a new session
         session = loadSession()
-        # Query for all 
+        # Query for all
         allEvents = session.query(CharityEvent).all()
         # Check if query was successful
         if allEvents == None:
@@ -285,8 +303,8 @@ class DB:
         else:
             session.close()
             return allEvents
-    
-    
+
+
     def get_charityEvent_by_id(self, passedInCharityEventId):
         """
         Args:
@@ -298,13 +316,15 @@ class DB:
         """
         # Create a new session and query for a charity event
         session = loadSession()
-        charityEvent = session.query(CharityEvent).filter(CharityEvent.charityEventID == passedInCharityEventId).first()
+        charityEvent = session.query(CharityEvent).filter(
+                CharityEvent.charityEventID == passedInCharityEventId).first()
         session.close()
-        return charityEvent      
-	
-	
-    def create_charityEvent(self, new_eventName, new_dateTime, new_loc_streetAddr,
-            new_loc_city, new_loc_state, new_loc_zip, new_loc_country, charityId):
+        return charityEvent
+
+
+    def create_charityEvent(self, new_eventName, new_dateTime,
+            new_loc_streetAddr, new_loc_city, new_loc_state, new_loc_zip,
+            new_loc_country, charityId):
         """ Creates a charity event and saves it in the database.
 
         Args:
@@ -313,8 +333,8 @@ class DB:
                 A new charity event with the specified args in the user table.
         Raises:
                 Exception if the charity event info was not saved properly.
-        """        
-        # Can't have empty event name, dateTime, and location 
+        """
+        # Can't have empty event name, dateTime, and location
         if str(new_eventName) == '':
             raise Exception("Charity Event Can't have empty event name")
         if str(new_dateTime) == '':
@@ -331,7 +351,7 @@ class DB:
             raise Exception("Charity Event Can't have empty country name")
         if(str(charityId) == ''):
             raise Exception("Charity Event Can't have an empty charity id")
-            
+
         # Create a new session
         session = loadSession()
         # Create a new charity event
@@ -343,7 +363,7 @@ class DB:
                 str(new_loc_zip),
                 str(new_loc_country),
                 charityId)
-                
+
         # Add new charity event
         session.add(new_charityEvent)
         # Commit/Save the record in the database
@@ -360,8 +380,8 @@ class DB:
             print '\nDid not create charity event\n'
             session.rollback()
             session.close()
-            raise Exception("Did not save correctly")	
-	
+            raise Exception("Did not save correctly")
+
 
     def delete_charityEvent(self, passedInCharityEventId):
         """ This function deletes an existing charity event
@@ -376,7 +396,8 @@ class DB:
         """
         # Create a new session & query
         session = loadSession()
-        charityEvent = session.query(CharityEvent).filter(CharityEvent.charityEventID == passedInCharityEventId)
+        charityEvent = session.query(CharityEvent).filter(
+                CharityEvent.charityEventID == passedInCharityEventId)
         # Check if charity event currently exists in db
         if charityEvent.first() == None:
             # if not, raise an Exception and close the session
@@ -394,11 +415,12 @@ class DB:
             session.close()
             raise Exception("Charity Event Id "
                     + str(passedICharityEventId)
-                    + " was not deleted. Rolling back")	
+                    + " was not deleted. Rolling back")
 
 
-    def update_charityEvent(self, passedInCharityEventId, update_eventName, update_dateTime,
-            update_loc_streetAddr, update_loc_city, update_loc_state, update_loc_zip, update_loc_country):
+    def update_charityEvent(self, passedInCharityEventId, update_eventName,
+            update_dateTime, update_loc_streetAddr, update_loc_city,
+            update_loc_state, update_loc_zip, update_loc_country):
         """ Updates an existing charity event in the database
 
         Args:
@@ -415,7 +437,7 @@ class DB:
         Raises:
                 Exception if the passedInCharityEventId does not exist in the db.
         """
-        # Can't have empty event name, dateTime, and location 
+        # Can't have empty event name, dateTime, and location
         if str(update_eventName) == '':
             raise Exception("Charity Event Can't have empty event name")
         if str(update_dateTime) == '':
@@ -429,7 +451,7 @@ class DB:
 	if str(update_loc_zip) == '':
             raise Exception("Charity Event Can't have empty zip code")
 	if str(update_loc_country) == '':
-            raise Exception("Charity Event Can't have empty country name")	
+            raise Exception("Charity Event Can't have empty country name")
 
         # Create a new session & query
         session = loadSession()
@@ -450,8 +472,8 @@ class DB:
             charityEvent.charityEvent_loc_city = str(update_loc_city)
             charityEvent.charityEvent_loc_state = str(update_loc_state)
             charityEvent.charityEvent_loc_zipcode = str(update_loc_zip)
-            charityEvent.charityEvent_loc_country = str(update_loc_country)            
-            
+            charityEvent.charityEvent_loc_country = str(update_loc_country)
+
             # Save the update
             session.commit()
 
@@ -465,8 +487,8 @@ class DB:
         else:
             session.close()
             return updated_charityEvent
-            
-            
+
+
 #----------------------------- Charity Functions ------------------------
 
     def get_allCharities(self):
@@ -522,7 +544,7 @@ class DB:
         session = loadSession()
         charity = session.query(Charity).filter(Charity.charityID == passedInCharityId).first()
         session.close()
-        return charity     
+        return charity
 
 
     def create_charity(self, new_charityName, new_address, new_email, new_phone):
@@ -535,7 +557,7 @@ class DB:
         Raises:
                 Exception if the charity info was not saved properly.
         """
-        # Can't have empty charity name, address, email, and phone 
+        # Can't have empty charity name, address, email, and phone
         if str(new_charityName) == '':
             raise Exception("Charity Can't have empty charity name")
         if str(new_address) == '':
@@ -543,7 +565,7 @@ class DB:
         if str(new_email) == '':
             raise Exception("Charity Can't have empty email address")
         if str(new_phone) == '':
-            raise Exception("Charity Can't have empty phone number")				
+            raise Exception("Charity Can't have empty phone number")
 
         # Create a new session
         session = loadSession()
@@ -568,8 +590,8 @@ class DB:
             print '\nDid not create charity\n'
             session.rollback()
             session.close()
-            raise Exception("Did not save correctly")	
-	
+            raise Exception("Did not save correctly")
+
 
     def delete_charity(self, passedInCharityName):
         """ This function deletes an existing charity event
@@ -589,7 +611,8 @@ class DB:
         if charity.first() == None:
             # if not, raise an Exception and close the session
             session.close()
-            raise Exception("Charity name " + str(passedInCharityName) + " NOT found")
+            raise Exception("Charity name " + str(passedInCharityName)
+                    + " NOT found")
         else:
             charity.delete()
             session.commit()
@@ -603,9 +626,10 @@ class DB:
             raise Exception("Charity name "
                     + str(passedInCharityName)
                     + " was not deleted. Rolling back")
- 
- 
-    def update_charity(self, passedInCharityId, update_charityName, update_address, update_email, update_phone):
+
+
+    def update_charity(self, passedInCharityId, update_charityName,
+            update_address, update_email, update_phone):
         """ Updates an existing charity in the database
 
         Args:
@@ -619,7 +643,7 @@ class DB:
         Raises:
                 Exception if the passedInCharityId does not exist in the db.
         """
-        # Can't have empty charity name, address, email, and phone 
+        # Can't have empty charity name, address, email, and phone
         if str(update_charityName) == '':
             raise Exception("Charity Can't have empty charity name")
         if str(update_address) == '':
@@ -645,8 +669,8 @@ class DB:
             charity.charityName = str(update_charityName)
             charity.charityAddress = str(update_address)
             charity.charityEmail = str(update_email)
-            charity.charityPhone = str(update_phone)         
-            
+            charity.charityPhone = str(update_phone)
+
             # Save the update
             session.commit()
 
@@ -656,7 +680,8 @@ class DB:
         if updated_charity == None:
             session.rollback()
             session.close()
-            raise Exception("Charity name " + str(update_charityName) + " not found.")
+            raise Exception("Charity name " + str(update_charityName)
+                    + " not found.")
         else:
             session.close()
             return updated_charity
@@ -666,19 +691,23 @@ class DB:
    
         # TODO: when no such event or user exists, it should not create the invitee.
         # TODO: investigate foreign key relationships
-    def create_charityEventInvitee(self, charityEventId, userId, user_isHost, user_isAttending):
+    def create_charityEventInvitee(self, charityEventId, userId,
+            user_isHost, user_isAttending):
         """
         Args:
                 charityEventId - The id of the charity event
                 userId - The id of the invitee
-                user_isHost - True if the user is a host, False if the user is a guest
-                user_isAttending - True if the user is attending, False if the user is NOT attending
+                user_isHost - True if the user is a host, False if the user is
+                a guest
+                user_isAttending - True if the user is attending, False if the
+                user is NOT attending
         Returns:
                 The invitee for the specified charity event.
         Raises:
-                Exception if there is no such charity event found and/or no such user found in the db.
+                Exception if there is no such charity event found and/or no
+                such user found in the db.
         """
-        # Can't have empty charityEventId, userId, isHost, and isAttending 
+        # Can't have empty charityEventId, userId, isHost, and isAttending
         if str(charityEventId) == '':
             raise Exception("Charity Event Id Can't be empty")
         if str(userId) == '':
@@ -686,7 +715,7 @@ class DB:
         if str(user_isHost) == '':
             raise Exception("Must specify if user isHost or NOT")
         if str(user_isAttending) == '':
-            raise Exception("Must specify if user isAttending or NOT")				
+            raise Exception("Must specify if user isAttending or NOT")
 
         # Create a new session
         session = loadSession()
@@ -713,6 +742,7 @@ class DB:
             session.close()
             raise Exception("Charity Event Invitee Did not save correctly")	
 	
+    
     # TODO:
     #~ def get_allUpcomingCharityEvents():
     def get_allCharityEventInvitees(self):
@@ -736,5 +766,5 @@ class DB:
         else:
             session.close()
             return allInvitees
+            raise Exception("Charity Event Invitee Did not save correctly")
 
-            
