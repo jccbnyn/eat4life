@@ -276,7 +276,7 @@ class HostEventForm(Form):
             for user in db.getAllVerifiedUsers()]
 
     charitiesList = [(str(charity.charityID), charity.charityName)
-            for charity in db.getAllCharities()]
+            for charity in db.get_allCharities()]
 
     db.disconnect()
 
