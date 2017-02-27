@@ -6,7 +6,8 @@ from Model import User, Charity, CharityMember
 from DBComm import DB
 
 # Import flask objects
-from flask import flash, abort, session, redirect, render_template, url_for
+from flask import abort, current_app, flash, \
+        session, redirect, render_template, url_for
 
 # Import WTForms to handle form templates
 from flask.ext.wtf import Form
@@ -14,11 +15,12 @@ from flask.ext.wtf import Form
 # Import WTForms helpers
 from wtforms import validators
 from wtforms.fields import DateField, DateTimeField, HiddenField, TextField, \
-       SelectMultipleField, StringField, PasswordField
-from wtforms.validators import Required
+       SelectField, SelectMultipleField, StringField, PasswordField
+
+from wtforms.validators import Required, StopValidation
 from wtforms import widgets
 
-from flask.ext.login import UserMixin, login_required, \
+from flask.ext.login import UserMixin, current_user, login_required, \
         login_user, logout_user
 
 # Import ItsDangerous for crypyo signing IDs
@@ -65,6 +67,9 @@ def index():
     '''
     Home page
     '''
+    if current_user != None:
+        if current_user.is_authenticated:
+            return redirect(url_for('account_home'))
 
     return render_template('index.html', title='Home')
 
@@ -77,7 +82,8 @@ def login():
 
     form = LoginForm()
     if form.validate_on_submit():
-        print 'VALID LOGIN'
+        current_app.logger.debug("Valid login as user %s"
+                % form.user.userName)
         flash(u'Successfully logged in as %s' % form.user.userName)
         login_user(form.user)
         return redirect(url_for('account_home'))
@@ -91,7 +97,10 @@ def logout():
     '''
     Handles logging out the active user
     '''
+    current_app.logger.debug("Logging out as user %s"
+            % current_user.userName)
     logout_user()
+    flash(u'Successfully logged out')
     return redirect(url_for('index'))
 
 @site.route("/signup", methods=["GET", 'POST'])
@@ -102,9 +111,11 @@ def sign_up():
 
     form = SignupForm()
     if form.validate_on_submit():
-        print 'Valid Sign up!'
-        flash (u'Signed up successful!')
-        session['user_id'] = form.user.userID
+        current_app.logger.debug("New user sign up for user %s"
+                % form.user.userName)
+
+        flash (u'Sign up successful!'
+                + 'Please check your email to complete sign up process')
 
         # Now send an email with the verification link
         serializer = URLSafeSerializer(site.secret_key)
@@ -114,6 +125,9 @@ def sign_up():
                 'Eat4Life - Verification Required',
                 'Please verify your email: http://localhost:5000/activate/'
                 + url)
+
+        current_app.logger.debug("Sent email for new user sign up to %s"
+                % form.user.emailAddress)
 
         return redirect(url_for('index'))
 
@@ -126,7 +140,7 @@ def mail_test():
     Sends a test email
     '''
     # TODO: Removes this in prod
-    mail.sendMail('luis111290@gmail.com', 'Hello!', 'Test Message!')
+    #mail.sendMail('luis111290@gmail.com', 'Hello!', 'Test Message!')
     return "Sent"
 
 @site.route("/activate/<key>", methods=['GET'])
@@ -216,10 +230,14 @@ class HostEventForm(Form):
             min=2, max=35,
             message="City must be 2-35 characters long.")])
 
-    # TODO: Define a dropdown with the states two char value
-    event_location_state = TextField('State', [
-        validators.DataRequired(),
-        validators.Length(min=2, max=35)])
+    state_choices = [
+            ('', ''), ('AL', 'Alabama'),('AK','Alaska'),
+            ('AZ', 'Arizona'), ('AR', 'Arkansas'),
+            ('CA', 'California')]
+
+    event_location_state = SelectField('State',
+            [validators.DataRequired()],
+            choices=state_choices)
 
     event_location_zip = StringField('Zip',
             [validators.Length(min=5, max=5,
@@ -262,10 +280,21 @@ class HostEventForm(Form):
 
         # This is how you fetch the invitees & charities selection
         # Returns as a list
-        #print "%s" % self.event_invitees_list.data
-        #print "%s" % self.event_charities_list.data
 
-        return False
+        # Perform some unique validations
+        isValidated = True
+        # Make sure there's at least one guest invited
+        if len(self.event_invitees_list.data) == 0:
+            flash('Please invite at least one guest')
+            isValidated = False
+
+        # Make sure there's at least one charity selected
+        if len(self.event_charities_list.data) == 0:
+            flash('Please select at least one charity')
+            isValidated = False
+
+        if not isValidated:
+            return False
 
         db = DB()
         db.connect()
@@ -317,7 +346,6 @@ class LoginForm(Form):
         # Fetch the user
         user = db.get_user(self.username.data)
         db.disconnect()
-        #print user
 
         # Validate the account's username-pw
         if user is None:

@@ -1,6 +1,7 @@
 *.pyc
 *.swp
 *.log
+*.db
 *.vcd
 *.out
 *.swo

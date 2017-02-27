@@ -69,7 +69,7 @@ class User(Base):
         """
         # TODO: We must add a user login table to handle user logins and save
         # to the DB whether or not the user has an authenticated session
-        return true
+        return True
 
     def is_anonymous(self):
         """
