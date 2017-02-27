@@ -1,5 +1,5 @@
 # Import the ORM objects from Model.py
-from Model import User, Charity, CharityMember, CharityEvent, CharityEventInvitees, loadSession
+from Model import User, Charity, CharityMember, CharityEvent, CharityEventInvitee, loadSession
 
 # Import the database conn. obj. from SQLAlchemy
 from sqlalchemy import create_engine
@@ -660,4 +660,84 @@ class DB:
         else:
             session.close()
             return updated_charity
+
+
+#------------------ Charity Event Invitees Functions -------------------            
+
+    def create_charityEventInvitee(self, charityEventId, userId, user_isHost, user_isAttending):
+        """
+        Args:
+                charityEventId - The id of the charity event
+                userId - The id of the invitee
+                user_isHost - True if the user is a host, False if the user is a guest
+                user_isAttending - True if the user is attending, False if the user is NOT attending
+        Returns:
+                The invitee for the specified charity event.
+        Raises:
+                Exception if there is no such charity event found and/or no such user found in the db.
+        """
+        # Can't have empty charityEventId, userId, isHost, and isAttending 
+        if str(charityEventId) == '':
+            raise Exception("Charity Event Id Can't be empty")
+        if str(userId) == '':
+            raise Exception("User Id for C.E.Invitee Can't be empty")
+        if str(user_isHost) == '':
+            raise Exception("Must specify if user isHost or NOT")
+        if str(user_isAttending) == '':
+            raise Exception("Must specify if user isAttending or NOT")				
+
+        # Create a new session
+        session = loadSession()
+        # Create a new charity event invitee
+        charityEventInvitee = CharityEventInvitee(charityEventId,
+                userId,
+                user_isHost,
+                user_isAttending)
+        print "charityEvent Id " + str(charityEventId)
+        print "user Id " + str(userId)
+        print "is Host " + str(user_isHost)
+        print "is Attending " + str(user_isAttending)
+        print "\t\ncharity event invitee : " + str(charityEventInvitee)
+
+        # Add new charity event invitee
+        session.add(charityEventInvitee)
+        # Commit/Save the record in the database
+        session.commit()
+        # Check if it's saved properly
+        charityInvitee = (session.query(CharityEventInvitee).filter(
+            CharityEventInvitee.charityEventID == charityEventId).first())
+        if charityInvitee != None:
+            print '\nCreated charity event invitee successfully\n'
+            session.close()
+            return charityInvitee
+        else:
+            # Otherwise, was not saved properly, rollback save
+            print '\nDid not create charity event invitee\n'
+            session.rollback()
+            session.close()
+            raise Exception("Charity Event Invitee Did not save correctly")	
+	
+
+    #~ def get_allCharityEventInvitees(self, passedInCharityEventId):
+        #~ """
+        #~ Args:
+                #~ passedInCharityEventId - The id of the charity event
+        #~ Returns:
+                #~ All the invited people for the specified charity event.
+        #~ Raises:
+                #~ Exception if there is no such charity event found in the db.
+        #~ """
+        #~ # Create a new session
+        #~ session = loadSession()
+        #~ # Query for the passed in charity event
+        #~ charityEvent = session.query(CharityEvent).filter(CharityEvent.charityEventID == passedInCharityEventId).first()
+        #~ # Check if query was successful
+        #~ if charityEvent == None:
+            #~ session.close()
+            #~ raise Exception("\nCharity Event NOT Found.\n")
+        #~ else:
+            #~ session.close()
+            #~ return charityEvent
+            
+
             
