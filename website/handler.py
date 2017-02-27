@@ -43,7 +43,33 @@ def account_details():
     '''
     Account details page. Allows user to update information.
     '''
-    return render_template('account_details.html')
+
+    form = EditAccountForm()
+    form.populate_fields(current_user)
+
+    if form.validate_on_submit():
+        current_app.logger.debug("New user sign up for user %s"
+                % form.user.userName)
+
+        flash (u'Sign up successful!'
+                + 'Please check your email to complete sign up process')
+
+        # Now send an email with the verification link
+        serializer = URLSafeSerializer(site.secret_key)
+        url = serializer.dumps(form.user.userID)
+
+        mail.sendMail(form.user.emailAddress,
+                'Eat4Life - Verification Required',
+                'Please verify your email: http://localhost:5000/activate/'
+                + url)
+
+        current_app.logger.debug("Sent email for new user sign up to %s"
+                % form.user.emailAddress)
+
+        return redirect(url_for('index'))
+
+    flash_errors(form)
+    return render_template('account_details.html', form=form)
 
 @site.route('/account/host-a-dinner', methods=['GET', 'POST'])
 @login_required
@@ -403,6 +429,79 @@ class SignupForm(Form):
         rv = Form.validate(self)
         if not rv:
             return False
+
+        # TODO: Query to see if the email or username is already taken
+
+        # TODO: Now, insert the new user onto the DB
+
+        db = DB()
+        db.connect()
+
+        new_user = db.create_user(self.username.data, self.password.data,
+                self.firstname.data, self.lastname.data, self.email.data,
+                self.phone.data)
+
+        db.disconnect()
+
+        # Set the login form's user
+        self.user = new_user
+        return True
+
+class EditAccountForm(Form):
+    '''
+    Edit account settings/details form class and validation
+    '''
+
+    firstname = StringField('First Name', [
+        validators.DataRequired(),
+        validators.Length(min=2)
+    ])
+
+    lastname = StringField('Last Name')
+
+    # TODO: Validation on phone? If entered, needs to be certain length
+    phone = StringField('Phone Number', [validators.Length(max=10)])
+
+    old_password = PasswordField('Current Password')
+
+    new_password = PasswordField('New Password',[
+        validators.EqualTo('confirm', message='Passwords must match!')
+    ])
+
+    confirm = PasswordField('Repeat Password')
+
+    def __init__(self, *args, **kwargs):
+        '''
+        Initializer for signup
+        '''
+        Form.__init__(self, *args, **kwargs)
+        self.user = None
+
+    def populate_fields(self, user):
+        '''
+        Function populates the fields
+        '''
+
+        self.firstname.data = user.firstName
+        self.lastname.data = user.lastName
+        self.phone.data = user.phoneNumber
+
+
+    def validate(self):
+        '''
+        Handles validating the changed account information
+        '''
+
+        # Validate our form first
+        rv = Form.validate(self)
+        if not rv:
+            return False
+
+        # Perform extra validation steps
+        # Make sure old password is correct if
+        # the form is updating the pw
+        db = DB()
+        db.connect()
 
         # TODO: Query to see if the email or username is already taken
 
